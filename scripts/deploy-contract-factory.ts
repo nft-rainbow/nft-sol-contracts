@@ -1,11 +1,12 @@
-import { conflux } from "hardhat";
 import { deploy } from "./lib/deploy";
 
 async function main() {
+  // direct deploy
   // @ts-ignore
-  const { address } = (await conflux.getSigners())[0];
-  const easynft = await deploy("ERC721NFT", address);
-  console.log("ERC721NFT deployed to:", easynft.contractCreated);
+  const customnft = await deploy("NFTContractFactory");
+  console.log("NFTContractFactory deployed to:", customnft.contractCreated);
+
+  // deploy by factory
 }
 
 // We recommend this pattern to be able to use async/await everywhere
