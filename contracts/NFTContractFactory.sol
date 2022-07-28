@@ -12,13 +12,13 @@ import "@confluxfans/contracts/InternalContracts/SponsorWhitelistControl.sol";
 import "@confluxfans/contracts/utils/ERC1820Context.sol";
 
 contract ConfluxHelper is ERC1820Context {
-    function setWhitelist(address targetContract, address user) public {
+    function setWhitelist(address targetContract) public {
         if (!_isCfxChain()) {
             return;
         }
 
         address[] memory users = new address[](1);
-        users[0] = user;
+        users[0] = address(0);
         InternalContracts.SPONSOR_CONTROL.addPrivilegeByAdmin(
             targetContract,
             users
@@ -48,7 +48,7 @@ contract NFTContractFactory is AccessControl, ConfluxHelper {
 
     function newERC721(address subOwner) public onlyRole(ROLE_OWNER) {
         address addr = address(new ERC721NFT(subOwner));
-        setWhitelist(addr, subOwner);
+        setWhitelist(addr);
         emit ContractCreated(ContractType.ERC721, addr);
     }
 
@@ -58,7 +58,7 @@ contract NFTContractFactory is AccessControl, ConfluxHelper {
         address subOwner
     ) public onlyRole(ROLE_OWNER) {
         address addr = address(new ERC721NFTCustom(name, symbol, subOwner));
-        setWhitelist(addr, subOwner);
+        setWhitelist(addr);
         emit ContractCreated(ContractType.ERC721Custom, address(addr));
     }
 
@@ -69,7 +69,7 @@ contract NFTContractFactory is AccessControl, ConfluxHelper {
         address subOwner
     ) public onlyRole(ROLE_OWNER) {
         address addr = address(new ERC1155NFT(uri, name, symbol, subOwner));
-        setWhitelist(addr, subOwner);
+        setWhitelist(addr);
         emit ContractCreated(ContractType.ERC1155, address(addr));
     }
 }
