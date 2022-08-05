@@ -1,3 +1,4 @@
+// eslint-disable-next-line node/no-missing-import
 import { deploy } from "./lib/deploy";
 
 async function main() {
