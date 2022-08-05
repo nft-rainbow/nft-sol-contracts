@@ -42,6 +42,15 @@ contract ERC1155NFT is ERC1155, AccessControl {
     }
 
     function mintTo(
+        address account, 
+        uint256 id, 
+        string memory tokenUri
+    ) public onlyRole(MINTER_ROLE) returns (uint256) {
+        mintTo(account, id, 1, tokenUri);
+        return id;
+    }
+
+    function mintTo(
         address account,
         uint256 id,
         uint256 amount,

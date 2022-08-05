@@ -6,6 +6,7 @@ import "./ERC721NFT.sol";
 import "./ERC721NFTCustom.sol";
 import "./ERC1155NFT.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
 import "@confluxfans/contracts/InternalContracts/InternalContractsLib.sol";
 import "@confluxfans/contracts/InternalContracts/SponsorWhitelistControl.sol";
@@ -26,7 +27,7 @@ contract ConfluxHelper is ERC1820Context {
     }
 }
 
-contract NFTContractFactory is AccessControl, ConfluxHelper {
+contract NFTContractFactory is AccessControl, ConfluxHelper, Initializable {
     bytes32 public constant ROLE_OWNER = keccak256("ROLE_OWNER");
 
     event ContractCreated(ContractType contractType, address contractAddress);
@@ -41,6 +42,10 @@ contract NFTContractFactory is AccessControl, ConfluxHelper {
         _grantRole(ROLE_OWNER, msg.sender);
     }
 
+    function initialize() public initializer {
+        _grantRole(ROLE_OWNER, msg.sender);
+    }
+
     function changeOwner(address newOwner) public onlyRole(ROLE_OWNER) {
         _revokeRole(ROLE_OWNER, msg.sender);
         _grantRole(ROLE_OWNER, newOwner);
@@ -48,7 +53,7 @@ contract NFTContractFactory is AccessControl, ConfluxHelper {
 
     function newERC721(address subOwner) public onlyRole(ROLE_OWNER) {
         address addr = address(new ERC721NFT(subOwner));
-        setWhitelist(addr, subOwner);
+        setWhitelist(addr, address(0));
         emit ContractCreated(ContractType.ERC721, addr);
     }
 
@@ -58,7 +63,7 @@ contract NFTContractFactory is AccessControl, ConfluxHelper {
         address subOwner
     ) public onlyRole(ROLE_OWNER) {
         address addr = address(new ERC721NFTCustom(name, symbol, subOwner));
-        setWhitelist(addr, subOwner);
+        setWhitelist(addr, address(0));
         emit ContractCreated(ContractType.ERC721Custom, address(addr));
     }
 
@@ -69,7 +74,7 @@ contract NFTContractFactory is AccessControl, ConfluxHelper {
         address subOwner
     ) public onlyRole(ROLE_OWNER) {
         address addr = address(new ERC1155NFT(uri, name, symbol, subOwner));
-        setWhitelist(addr, subOwner);
+        setWhitelist(addr, address(0));
         emit ContractCreated(ContractType.ERC1155, address(addr));
     }
 }

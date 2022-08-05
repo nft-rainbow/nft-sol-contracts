@@ -8,7 +8,7 @@ async function main() {
   // @ts-ignore
   const factory = await conflux.getContractAt(
     "NFTContractFactory",
-    "cfxtest:acamkyztefkzz9prr3jd53kgcweaabdaw6e67hnw4r"
+    "cfxtest:acbjznfws0ku06capkz82gam4jnvuv9j6avg9jxfm3"
   );
 
   const customnft = await factory
