@@ -12,7 +12,7 @@ contract ERC721NFT is ERC721URIStorage, AccessControl {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-    constructor(address owner) ERC721("EasyNFT", "ENFT") {
+    constructor(address owner) ERC721("RainbowNFT", "RNFT") {
         _setupRole(MINTER_ROLE, owner);
     }
 
