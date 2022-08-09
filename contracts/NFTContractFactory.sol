@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 import "./ERC721NFT.sol";
 import "./ERC721NFTCustom.sol";
 import "./ERC1155NFT.sol";
+import "./ERC1155NFTCustom.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
@@ -74,6 +75,17 @@ contract NFTContractFactory is AccessControl, ConfluxHelper, Initializable {
         address subOwner
     ) public onlyRole(ROLE_OWNER) {
         address addr = address(new ERC1155NFT(uri, name, symbol, subOwner));
+        setWhitelist(addr, address(0));
+        emit ContractCreated(ContractType.ERC1155, address(addr));
+    }
+
+    function newERC1155Custom(
+        string memory uri,
+        string memory name,
+        string memory symbol,
+        address subOwner
+    ) public onlyRole(ROLE_OWNER) {
+        address addr = address(new ERC1155NFTCustom(uri, name, symbol, subOwner));
         setWhitelist(addr, address(0));
         emit ContractCreated(ContractType.ERC1155, address(addr));
     }
