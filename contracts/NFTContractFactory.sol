@@ -60,9 +60,15 @@ contract NFTContractFactory is AccessControl, ConfluxHelper, Initializable {
 	function newERC721Custom(
 		string memory name,
 		string memory symbol,
-		address subOwner
+		string memory baseURI,
+		uint256 royaltiesBps,
+		address royaltiesAddress,
+		address owner,
+		bool tokensBurnable
 	) public onlyRole(ROLE_OWNER) {
-		address addr = address(new ERC721NFTCustom(name, symbol, subOwner));
+		address addr = address(
+			new ERC721NFTCustom(name, symbol, baseURI, royaltiesBps, royaltiesAddress, owner, tokensBurnable)
+		);
 		setWhitelist(addr, address(0));
 		emit ContractCreated(ContractType.ERC721Custom, address(addr));
 	}

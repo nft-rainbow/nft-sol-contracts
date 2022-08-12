@@ -4,8 +4,11 @@ pragma solidity ^0.8.0;
 // import "./Config.sol";
 import "./GranularRoles.sol";
 import "./Base64.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract ConfigManager is GranularRoles {
+	using Strings for uint256;
+	
 	uint16 internal constant ROYALTIES_BASIS = 10000;
 
 	// The contract owner address. If you wish to own the contract, then set it as your wallet address.

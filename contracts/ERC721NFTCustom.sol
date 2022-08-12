@@ -28,7 +28,7 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager {
 		address royaltiesAddress,
 		address owner,
 		bool tokensBurnable
-	) ERC721(name, symbol) ConfigManager(name, symbol) {
+	) ERC721(name, symbol) {
 		setURI(baseURI);
 		_initRolesWithMsgSender(owner);
 		setTokensBurnable(tokensBurnable);
@@ -64,15 +64,15 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager {
 		setURI(_tokenId, _newUri);
 	}
 
-	function burn(address user, uint256 id) public onlyRole(ADMIN_ROLE) {
+	function burn(uint256 id) public onlyRole(ADMIN_ROLE) {
 		require(tokensBurnable, "NFT: tokens burning is disabled");
-		_burn(user, id);
+		_burn(id);
 	}
 
 	function burnBatch(address user, uint256[] memory ids) public onlyRole(ADMIN_ROLE) {
 		require(tokensBurnable, "NFT: tokens burning is disabled");
 		for (uint256 i = 0; i < ids.length; i++) {
-			_burn(user, ids[i]);
+			_burn(ids[i]);
 		}
 	}
 
@@ -117,7 +117,7 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager {
 		if (bytes(tokenUri).length > 0) {
 			setURI(id, tokenUri);
 		}
-		_mint(to, id, "");
+		_mint(to, id);
 	}
 
 	function mintTo(
@@ -159,11 +159,11 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager {
 		address to,
 		uint256 tokenId
 	) internal override(ERC721Enumerable, ERC721) {
-		CRC721Enumerable._beforeTokenTransfer(from, to, tokenId);
+		ERC721Enumerable._beforeTokenTransfer(from, to, tokenId);
 	}
 
 	function tokenURI(uint256 tokenId) public view override(ERC721URIStorage, ERC721) returns (string memory) {
-		return ERC721URIStorage.uri(tokenId);
+		return ERC721URIStorage.tokenURI(tokenId);
 	}
 
 	function _burn(uint256 tokenId) internal override(ERC721URIStorage, ERC721) {
