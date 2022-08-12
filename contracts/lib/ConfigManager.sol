@@ -3,13 +3,11 @@ pragma solidity ^0.8.0;
 
 // import "./Config.sol";
 import "./GranularRoles.sol";
+import "./Base64.sol";
 
 contract ConfigManager is GranularRoles {
 	uint16 internal constant ROYALTIES_BASIS = 10000;
-	// Name of the NFT contract.
-	string public name;
-	// Symbol of the NFT contract.
-	string public symbol;
+
 	// The contract owner address. If you wish to own the contract, then set it as your wallet address.
 	// This is also the wallet that can manage the contract on NFT marketplaces.
 	// address owner;
@@ -17,7 +15,7 @@ contract ConfigManager is GranularRoles {
 	bool tokensBurnable;
 	// Metadata base URI for tokens, NFTs minted in this contract will have metadata URI of `baseURI` + `tokenID`.
 	// Set this to reveal token metadata.
-	string baseURI;
+	// string baseURI;
 	// If true, the base URI of the NFTs minted in the specified contract can be updated after minting (token URIs
 	// are not frozen on the contract level). This is useful for revealing NFTs after the drop. If false, all the
 	// NFTs minted in this contract are frozen by default which means token URIs are non-updatable.
@@ -33,9 +31,7 @@ contract ConfigManager is GranularRoles {
 	event BurnableChanged(bool burnable);
 	event RoyaltyUpdated(uint256 royaltiesBps, address royaltiesAddress);
 
-	constructor(string memory _name, string memory _symbol) {
-		name = _name;
-		symbol = _symbol;
+	constructor() {
 		metadataUpdatable = true;
 		tokensTransferable = true;
 	}
@@ -55,6 +51,33 @@ contract ConfigManager is GranularRoles {
 		require(!metadataUpdatable, "Metadata already frozen globally");
 		metadataUpdatable = true;
 		emit PermanentURIGlobal();
+	}
+
+	function royaltyInfo(uint256 tokenId, uint256 salePrice) external view returns (address, uint256) {
+		return (royaltiesAddress, (royaltiesBps * salePrice) / ROYALTIES_BASIS);
+	}
+
+	function contractURI() external view returns (string memory) {
+		string memory json = Base64.encode(
+			bytes(
+				string(
+					abi.encodePacked(
+						// solium-disable-next-line quotes
+						'{"seller_fee_basis_points": ', // solhint-disable-line
+						royaltiesBps.toString(),
+						// solium-disable-next-line quotes
+						', "fee_recipient": "', // solhint-disable-line
+						uint256(uint160(royaltiesAddress)).toHexString(20),
+						// solium-disable-next-line quotes
+						'"}' // solhint-disable-line
+					)
+				)
+			)
+		);
+
+		string memory output = string(abi.encodePacked("data:application/json;base64,", json));
+
+		return output;
 	}
 
 	// function setRuntime(Config.Runtime memory _runtime) internal {
