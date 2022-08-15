@@ -5,7 +5,8 @@
 * Support NFT transfer, burn and configable
 * Support ERC-2981
 * Batch mint & transfer
-* TokenURI update
+* TokenURI updatable
+* NFT enumerable
 
 ## v0.1
 
