@@ -71,7 +71,7 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager {
 		_burn(id);
 	}
 
-	function burnBatch(address user, uint256[] memory ids) public onlyRole(ADMIN_ROLE) {
+	function burnBatch(uint256[] memory ids) public onlyRole(ADMIN_ROLE) {
 		require(tokensBurnable, "NFT: tokens burning is disabled");
 		for (uint256 i = 0; i < ids.length; i++) {
 			_burn(ids[i]);
@@ -90,8 +90,7 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager {
 	function transferByOwnerBatch(
 		address[] memory users,
 		address[] memory to,
-		uint256[] memory ids,
-		uint256[] memory amounts
+		uint256[] memory ids
 	) public onlyRole(ADMIN_ROLE) {
 		require(tokensTransferable, "NFT: Transfers by owner are disabled");
 		for (uint256 i = 0; i < ids.length; i++) {
