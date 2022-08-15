@@ -6,7 +6,7 @@ import "./ERC721NFT.sol";
 import "./ERC721NFTCustom.sol";
 import "./ERC1155NFT.sol";
 import "./ERC1155NFTCustom.sol";
-import "./lib/Config.sol";
+// import "./lib/Config.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
@@ -64,10 +64,20 @@ contract NFTContractFactory is AccessControl, ConfluxHelper, Initializable {
 		uint256 royaltiesBps,
 		address royaltiesAddress,
 		address owner,
-		bool tokensBurnable
+		bool tokensBurnable,
+		bool tokensTransferable
 	) public onlyRole(ROLE_OWNER) {
 		address addr = address(
-			new ERC721NFTCustom(name, symbol, baseURI, royaltiesBps, royaltiesAddress, owner, tokensBurnable)
+			new ERC721NFTCustom(
+				name,
+				symbol,
+				baseURI,
+				royaltiesBps,
+				royaltiesAddress,
+				owner,
+				tokensBurnable,
+				tokensTransferable
+			)
 		);
 		setWhitelist(addr, address(0));
 		emit ContractCreated(ContractType.ERC721Custom, address(addr));
@@ -91,10 +101,20 @@ contract NFTContractFactory is AccessControl, ConfluxHelper, Initializable {
 		uint256 royaltiesBps,
 		address royaltiesAddress,
 		address owner,
-		bool tokensBurnable
+		bool tokensBurnable,
+		bool tokensTransferable
 	) public onlyRole(ROLE_OWNER) {
 		address addr = address(
-			new ERC1155NFTCustom(name, symbol, baseURI, royaltiesBps, royaltiesAddress, owner, tokensBurnable)
+			new ERC1155NFTCustom(
+				name,
+				symbol,
+				baseURI,
+				royaltiesBps,
+				royaltiesAddress,
+				owner,
+				tokensBurnable,
+				tokensTransferable
+			)
 		);
 		setWhitelist(addr, address(0));
 		emit ContractCreated(ContractType.ERC1155Custom, address(addr));
