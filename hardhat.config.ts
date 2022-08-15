@@ -7,6 +7,7 @@ import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
 import "hardhat-conflux";
+import { checkRole, tryMintTo } from "./tools/validate";
 
 dotenv.config();
 
@@ -17,6 +18,36 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   const accounts = await hre.network.config.accounts;
   console.log(accounts);
 });
+
+task("checkrole", "Check user if is the role")
+  .addParam("address", "contract address")
+  .addParam("role", "role name")
+  .addParam("user", "user address")
+  .setAction(async (taskArgs, hre) => {
+    const ok = await checkRole(
+      // @ts-ignore
+      hre.network.config.url,
+      taskArgs.address,
+      taskArgs.role,
+      taskArgs.user
+    );
+    console.log(
+      `${taskArgs.user} has role ${taskArgs.role} of  ${taskArgs.address}: ${ok}`
+    );
+  });
+
+task("tryMintTo", "Check if could mint to success")
+  .addParam("address", "contract address")
+  .addParam("user", "user address")
+  .setAction(async (taskArgs, hre) => {
+    await tryMintTo(
+      // @ts-ignore
+      hre.network.config.url,
+      taskArgs.address,
+      taskArgs.user
+    );
+    console.log(`${taskArgs.user} try mint ${taskArgs.address} ok`);
+  });
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
