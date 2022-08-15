@@ -23,6 +23,7 @@ abstract contract GranularRoles is AccessControl {
 		address[] memory owners = new address[](1);
 		owners[0] = owner;
 		_initRoles(owners);
+    
 		if (msg.sender != owner) {
 			owners[0] = msg.sender;
 			_initRoles(owners);

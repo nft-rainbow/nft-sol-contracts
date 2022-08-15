@@ -10,3 +10,4 @@ artifacts
 
 tmp
 .DS_Store
+.vscode
