@@ -78,7 +78,7 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager {
 		}
 	}
 
-	function transferByOwner(
+	function transferByAdmin(
 		address user,
 		address to,
 		uint256 id
@@ -87,7 +87,7 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager {
 		_safeTransfer(user, to, id, "");
 	}
 
-	function transferByOwnerBatch(
+	function transferBatchByAdmin(
 		address[] memory users,
 		address[] memory to,
 		uint256[] memory ids

@@ -84,7 +84,7 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 		_burnBatch(user, ids, values);
 	}
 
-	function transferByOwner(
+	function transferByAdmin(
 		address user,
 		address to,
 		uint256 id,
@@ -94,7 +94,7 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 		_safeTransferFrom(user, to, id, amount, "");
 	}
 
-	function transferByOwnerBatch(
+	function transferAdminByOwner(
 		address[] memory users,
 		address[] memory to,
 		uint256[] memory ids,
