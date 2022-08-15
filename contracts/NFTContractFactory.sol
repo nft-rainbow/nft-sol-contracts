@@ -93,9 +93,6 @@ contract NFTContractFactory is AccessControl, ConfluxHelper, Initializable {
 		address owner,
 		bool tokensBurnable
 	) public onlyRole(ROLE_OWNER) {
-		// Config.Deployment memory deployment = Config.Deployment(name, symbol, true);
-		// Config.Runtime memory runtime = Config.Runtime(uri, true, true, 0, subOwner);
-		// address addr = address(new ERC1155NFTCustom(deployment, runtime, subOwner));
 		address addr = address(
 			new ERC1155NFTCustom(name, symbol, baseURI, royaltiesBps, royaltiesAddress, owner, tokensBurnable)
 		);

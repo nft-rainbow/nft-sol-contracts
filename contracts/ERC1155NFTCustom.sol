@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@confluxfans/contracts/token/CRC1155/extensions/CRC1155Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155URIStorage.sol";
 
-
 // import "./lib/Config.sol";
 import "./lib/ConfigManager.sol";
 import "./lib/StringUtils.sol";
@@ -16,7 +15,7 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 	using Strings for uint256;
 	using StringUtils for string;
 
-	string public name;	
+	string public name;
 	string public symbol;
 	mapping(uint256 => bool) public freezeTokenUris;
 
@@ -29,13 +28,15 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 		uint256 royaltiesBps,
 		address royaltiesAddress,
 		address owner,
-		bool tokensBurnable
+		bool tokensBurnable,
+		bool tokensTransferable
 	) ERC1155(baseURI) {
 		name = _name;
 		symbol = _symbol;
 		_setURI(baseURI);
 		_initRolesWithMsgSender(owner);
 		setTokensBurnable(tokensBurnable);
+		setTokensTransferable(tokensTransferable);
 		setRoyalties(royaltiesBps, royaltiesAddress);
 	}
 

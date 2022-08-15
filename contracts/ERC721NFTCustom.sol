@@ -23,15 +23,17 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager {
 	constructor(
 		string memory name,
 		string memory symbol,
-		string memory baseURI,
+		string memory uri,
 		uint256 royaltiesBps,
 		address royaltiesAddress,
 		address owner,
-		bool tokensBurnable
+		bool tokensBurnable,
+		bool tokensTransferable
 	) ERC721(name, symbol) {
-		setURI(baseURI);
+		setURI(uri);
 		_initRolesWithMsgSender(owner);
 		setTokensBurnable(tokensBurnable);
+		setTokensTransferable(tokensTransferable);
 		setRoyalties(royaltiesBps, royaltiesAddress);
 	}
 

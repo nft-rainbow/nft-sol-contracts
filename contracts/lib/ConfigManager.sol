@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract ConfigManager is GranularRoles {
 	using Strings for uint256;
-	
+
 	uint16 internal constant ROYALTIES_BASIS = 10000;
 
 	// The contract owner address. If you wish to own the contract, then set it as your wallet address.
@@ -32,6 +32,7 @@ contract ConfigManager is GranularRoles {
 
 	event PermanentURIGlobal();
 	event BurnableChanged(bool burnable);
+	event TransferableChanged(bool transferable);
 	event RoyaltyUpdated(uint256 royaltiesBps, address royaltiesAddress);
 
 	constructor() {
@@ -44,15 +45,20 @@ contract ConfigManager is GranularRoles {
 		emit BurnableChanged(burnable);
 	}
 
+	function setTokensTransferable(bool transferable) internal {
+		tokensTransferable = transferable;
+		emit TransferableChanged(transferable);
+	}
+
 	function setRoyalties(uint256 _royaltiesBps, address _royaltiesAddress) public onlyRole(ADMIN_ROLE) {
 		royaltiesBps = _royaltiesBps;
 		royaltiesAddress = _royaltiesAddress;
 		emit RoyaltyUpdated(royaltiesBps, royaltiesAddress);
 	}
 
-	function freezeGolabalMetadata() public onlyRole(ADMIN_ROLE) {
+	function freezeGlobalMetadata() public onlyRole(ADMIN_ROLE) {
 		require(!metadataUpdatable, "Metadata already frozen globally");
-		metadataUpdatable = true;
+		metadataUpdatable = false;
 		emit PermanentURIGlobal();
 	}
 
