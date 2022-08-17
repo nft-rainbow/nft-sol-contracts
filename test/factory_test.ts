@@ -1,9 +1,10 @@
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
+// eslint-disable-next-line node/no-missing-import
 import { ERC1155NFTCustom, ERC721NFTCustom, NFTContractFactory } from "../typechain";
 
 const { keccak256 } = ethers.utils;
+// eslint-disable-next-line no-unused-vars
 const roles = {
     ADMIN_ROLE: keccak256(Buffer.from("ADMIN_ROLE")),
     MINT_ROLE: keccak256(Buffer.from("MINT_ROLE")),

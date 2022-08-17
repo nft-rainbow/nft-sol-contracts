@@ -1,6 +1,7 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
+// eslint-disable-next-line node/no-missing-import
 import { ERC1155NFTCustom } from "../typechain";
 
 const { keccak256 } = ethers.utils;
@@ -15,6 +16,7 @@ async function deploy(
     tokensTransferable = true,
     baseURI = "http://www.google.com",
 ): Promise<ERC1155NFTCustom> {
+    // eslint-disable-next-line no-unused-vars
     const [admin, receiver, owner, stranger0, stranger1, stranger2, stranger3, stranger4] = await ethers.getSigners();
 
     const StringsUtils = await ethers.getContractFactory("StringUtils");
@@ -31,8 +33,10 @@ async function deploy(
 };
 
 describe("test erc1155custom", async function () {
-    let admin: SignerWithAddress, receiver: SignerWithAddress, owner: SignerWithAddress, stranger0: SignerWithAddress,
-        stranger1: SignerWithAddress, stranger2: SignerWithAddress, stranger3: SignerWithAddress, stranger4: SignerWithAddress
+    // eslint-disable-next-line no-unused-vars
+    let admin: SignerWithAddress, receiver: SignerWithAddress, owner: SignerWithAddress, stranger0: SignerWithAddress
+    // eslint-disable-next-line no-unused-vars
+    let stranger1: SignerWithAddress, stranger2: SignerWithAddress, stranger3: SignerWithAddress, stranger4: SignerWithAddress
 
     before(async function () {
         [admin, receiver, owner, stranger0, stranger1, stranger2, stranger3, stranger4] = await ethers.getSigners();
@@ -42,7 +46,7 @@ describe("test erc1155custom", async function () {
 
     it("after intial roles are correct", async function () {
         const nft = await deploy()
-        
+
         expect(await nft.hasRole(roles.ADMIN_ROLE, admin.address)).equal(true);
         expect(await nft.hasRole(roles.ADMIN_ROLE, owner.address)).equal(true);
         expect(await nft.hasRole(roles.ADMIN_ROLE, stranger0.address)).equal(false);

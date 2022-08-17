@@ -1,9 +1,9 @@
 // eslint-disable-next-line node/no-missing-import
 import { deploy, deployWithLibs } from "./lib/deploy";
-import { FactoryOptions } from "hardhat-conflux/types"
+// eslint-disable-next-line import/no-duplicates
 import { network } from "hardhat";
-import { config } from "dotenv";
 // @ts-ignore
+// eslint-disable-next-line import/no-duplicates
 import { conflux } from "hardhat";
 
 async function main() {
