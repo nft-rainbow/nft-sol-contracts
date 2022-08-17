@@ -1,9 +1,3 @@
-// const assert = require('assert');
-// const mocha = require('mocha');
-// const { ethers } = require('hardhat')
-// const { describe, it, before, after } = mocha
-
-// import mocha from "mocha";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
@@ -31,7 +25,8 @@ async function deploy(
             StringUtils: lib.address,
         }
     });
-    const nft = await NFT.deploy("NFT RAINBOW URI", "NFT RAINBOW", "NFT", 200, owner.address, owner.address, true);
+    const nft = await NFT.deploy();
+    await nft.initialize("NFT RAINBOW URI", "NFT RAINBOW", "NFT", 200, owner.address, [owner.address, admin.address], true, true)
     return nft as ERC1155NFTCustom
 };
 
@@ -41,10 +36,25 @@ describe("test erc1155custom", async function () {
 
     before(async function () {
         [admin, receiver, owner, stranger0, stranger1, stranger2, stranger3, stranger4] = await ethers.getSigners();
+        // console.log("nft deployed, admin %s, owner %s, stranger0 %s", admin.address, owner.address, stranger0.address)
+        // console.log("admin role %s, mint role %s", roles.ADMIN_ROLE, roles.MINT_ROLE);
     });
+
+    it("after intial roles are correct", async function () {
+        const nft = await deploy()
+        
+        expect(await nft.hasRole(roles.ADMIN_ROLE, admin.address)).equal(true);
+        expect(await nft.hasRole(roles.ADMIN_ROLE, owner.address)).equal(true);
+        expect(await nft.hasRole(roles.ADMIN_ROLE, stranger0.address)).equal(false);
+
+        expect(await nft.hasRole(roles.MINT_ROLE, admin.address)).equal(true);
+        expect(await nft.hasRole(roles.MINT_ROLE, owner.address)).equal(true);
+        expect(await nft.hasRole(roles.MINT_ROLE, stranger0.address)).equal(false);
+    })
 
     it("only mint role and admin could mint", async function () {
         const nft = await deploy()
+
         await nft["mintTo(address,uint256,uint256,string)"](stranger1.address, 1, 10, "url_1")
         await nft.connect(owner)["mintTo(address,uint256,uint256,string)"](stranger1.address, 2, 10, "url_2")
         await expect(nft.connect(stranger1)["mintTo(address,uint256,uint256,string)"](stranger1.address, 3, 10, "url_1")).to.be.reverted;
@@ -53,24 +63,24 @@ describe("test erc1155custom", async function () {
     it("totoal supply should be right", async function () {
         // deploy
         const nft = await deploy()
-        
+
         // mint and check total supply
         await nft["mintTo(address,uint256,uint256,string)"](stranger1.address, 1, 10, "url_1")
         expect(await nft["totalSupply()"]()).equal(1);
         expect(await nft["totalSupply(uint256)"](1)).equal(10);
-        
+
         // batch mint and check total supply
         await nft.mintToBatch([stranger1.address, stranger2.address], [2, 3], [10, 10], ["url_2", "url_3"])
         expect(await nft["totalSupply()"]()).equal(3);
         expect(await nft["totalSupply(uint256)"](2)).equal(10);
-        
+
         // transfer and check total supply
-        await nft.transferByOwner(stranger1.address, stranger3.address, 1, 5)
+        await nft.transferByAdmin(stranger1.address, stranger3.address, 1, 5)
         expect(await nft["totalSupply()"]()).equal(3);
         expect(await nft["totalSupply(uint256)"](1)).equal(10);
-        
+
         // transfer batch and check total supply
-        await nft.transferByOwnerBatch([stranger1.address, stranger3.address], [stranger2.address, stranger1.address], [2, 1], [5, 5])
+        await nft.transferBatchByAdmin([stranger1.address, stranger3.address], [stranger2.address, stranger1.address], [2, 1], [5, 5])
         expect(await nft["totalSupply()"]()).equal(3);
         expect(await nft["totalSupply(uint256)"](1)).equal(10);
         expect(await nft["totalSupply(uint256)"](2)).equal(10);

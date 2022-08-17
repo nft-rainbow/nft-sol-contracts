@@ -15,45 +15,58 @@ contract ConfigManager is GranularRoles {
 	// This is also the wallet that can manage the contract on NFT marketplaces.
 	// address owner;
 	// If true, tokens may be burned by owner. Cannot be changed later.
-	bool tokensBurnable;
+	bool public tokensBurnable;
 	// Metadata base URI for tokens, NFTs minted in this contract will have metadata URI of `baseURI` + `tokenID`.
 	// Set this to reveal token metadata.
 	// string baseURI;
 	// If true, the base URI of the NFTs minted in the specified contract can be updated after minting (token URIs
 	// are not frozen on the contract level). This is useful for revealing NFTs after the drop. If false, all the
 	// NFTs minted in this contract are frozen by default which means token URIs are non-updatable.
-	bool metadataUpdatable;
+	bool public metadataUpdatable;
 	// If true, tokens may be transferred by owner. Default is true. Can be only changed to false.
-	bool tokensTransferable;
+	bool public tokensTransferable;
 	// Secondary market royalties in basis points (100 bps = 1%)
-	uint256 royaltiesBps;
+	uint256 public royaltiesBps;
 	// Address for royalties
-	address royaltiesAddress;
+	address public royaltiesAddress;
 
 	event PermanentURIGlobal();
 	event BurnableChanged(bool burnable);
 	event TransferableChanged(bool transferable);
 	event RoyaltyUpdated(uint256 royaltiesBps, address royaltiesAddress);
 
-	constructor() {
+	function initalize() internal virtual override {
+		super.initalize();
 		metadataUpdatable = true;
 		tokensTransferable = true;
 	}
 
-	function setTokensBurnable(bool burnable) internal {
+	function _setTokensBurnable(bool burnable) internal {
 		tokensBurnable = burnable;
 		emit BurnableChanged(burnable);
 	}
 
-	function setTokensTransferable(bool transferable) internal {
+	function _setTokensTransferable(bool transferable) internal {
 		tokensTransferable = transferable;
 		emit TransferableChanged(transferable);
 	}
 
-	function setRoyalties(uint256 _royaltiesBps, address _royaltiesAddress) public onlyRole(ADMIN_ROLE) {
+	function _setRoyalties(uint256 _royaltiesBps, address _royaltiesAddress) internal {
 		royaltiesBps = _royaltiesBps;
 		royaltiesAddress = _royaltiesAddress;
 		emit RoyaltyUpdated(royaltiesBps, royaltiesAddress);
+	}
+
+	function setTokensBurnable(bool burnable) public onlyRole(ADMIN_ROLE) {
+		_setTokensBurnable(burnable);
+	}
+
+	function setTokensTransferable(bool transferable) public onlyRole(ADMIN_ROLE) {
+		_setTokensTransferable(transferable);
+	}
+
+	function setRoyalties(uint256 _royaltiesBps, address _royaltiesAddress) public onlyRole(ADMIN_ROLE) {
+		_setRoyalties(_royaltiesBps, _royaltiesAddress);
 	}
 
 	function freezeGlobalMetadata() public onlyRole(ADMIN_ROLE) {
@@ -88,23 +101,4 @@ contract ConfigManager is GranularRoles {
 
 		return output;
 	}
-
-	// function setRuntime(Config.Runtime memory _runtime) internal {
-	// 	// metadataUpdatable could not change from false to true
-	// 	if (!runtime.metadataUpdatable) {
-	// 		require(!_runtime.metadataUpdatable, "Metadata could not unfrozen");
-	// 		require(
-	// 			(keccak256(abi.encodePacked(_runtime.baseURI)) == keccak256(abi.encodePacked(runtime.baseURI))),
-	// 			"Metadata is frozen"
-	// 		);
-	// 	}
-	// 	if (runtime.metadataUpdatable && !_runtime.metadataUpdatable) {
-	// 		emit PermanentURIGlobal();
-	// 	}
-	// 	runtime = _runtime;
-	// }
-
-	// function setInitial(Config.Deployment memory _deployment) internal {
-	// 	deployment = _deployment;
-	// }
 }
