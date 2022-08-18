@@ -19,6 +19,16 @@ abstract contract GranularRoles is AccessControl {
 		_setRoleAdmin(MINT_ROLE, ADMIN_ROLE);
 	}
 
+	function _initRolesWithMsgSender(address owner) internal {
+		address[] memory owners = new address[](1);
+		owners[0] = owner;
+		_initRoles(owners);
+		if (msg.sender != owner) {
+			owners[0] = msg.sender;
+			_initRoles(owners);
+		}
+	}
+
 	function _initRoles(address[] memory owners) internal {
 		for (uint256 i = 0; i < owners.length; i++) {
 			_setupRole(MINT_ROLE, owners[i]);
