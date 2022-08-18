@@ -132,10 +132,10 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 		string memory tokenUri
 	) internal {
 		revertIfUriConflict(id, tokenUri);
+		_mint(to, id, amount, "");
 		if (bytes(tokenUri).length > 0) {
 			setURI(id, tokenUri);
 		}
-		_mint(to, id, amount, "");
 	}
 
 	function mintTo(

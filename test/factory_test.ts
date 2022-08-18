@@ -75,18 +75,37 @@ async function deploy721custom(
 
 describe("test factory", async function () {
     it("test new erc1155custom", async function () {
-        const [admin, , owner] = await ethers.getSigners();
+        const [admin, receiver, owner] = await ethers.getSigners();
         const factory = await deployAndSetTemplates();
         const tx = await factory.newERC1155Custom("NFT RAINBOW URI", "NFT RAINBOW", "NFT", 200, owner.address, [owner.address, admin.address], true, true);
         const receipt = await tx.wait()
         expect(receipt.status).equals(1)
+
+        // batch mint to
+        // console.log("receipt.logs[-1]", receipt.logs.slice(-1)[0]);
+        const log = receipt.logs.slice(-1)[0]
+        const ld = factory.interface.parseLog(log)
+        // console.log("new contract address", ld.args.contractAddress)
+
+        const erc1155custom = await ethers.getContractAt("ERC1155NFTCustom", ld.args.contractAddress)
+        await erc1155custom.mintToBatch([receiver.address], [3849589], [2], ["1155_uri"])
+        await expect(erc1155custom.connect(receiver).mintToBatch([receiver.address], [1], [2], ["1155_uri"])).to.be.reverted;
     })
 
     it("test new erc721custom", async function () {
-        const [admin, , owner] = await ethers.getSigners();
+        const [admin, receiver, owner] = await ethers.getSigners();
         const factory = await deployAndSetTemplates();
         const tx = await factory.newERC721Custom("NFT RAINBOW URI", "NFT RAINBOW", "NFT", 200, owner.address, [owner.address, admin.address], true, true, 1);
         const receipt = await tx.wait()
         expect(receipt.status).equals(1)
+
+        // batch mint to
+        const log = receipt.logs.slice(-1)[0]
+        const ld = factory.interface.parseLog(log)
+        // console.log("new contract address", ld.args.contractAddress)
+
+        const erc721custom = await ethers.getContractAt("ERC721NFTCustom", ld.args.contractAddress)
+        await erc721custom.mintToBatch([receiver.address], [3849589], ["721_uri"])
+        await expect(erc721custom.connect(receiver).mintToBatch([receiver.address], [1], ["721_uri"])).to.be.reverted;
     })
 })

@@ -150,10 +150,10 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 		uint256 id,
 		string memory tokenUri
 	) internal {
+		_mint(to, id);
 		if (bytes(tokenUri).length > 0) {
 			setURI(id, tokenUri);
 		}
-		_mint(to, id);
 	}
 
 	function mintTo(
