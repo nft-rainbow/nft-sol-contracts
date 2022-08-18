@@ -11,18 +11,21 @@ async function main() {
   const accounts = await conflux.getSigners();
 
   console.log("start");
-  const nftFactoryProxyAddress: { [networkName: string]: string } = {
-    "cfxtest": "cfxtest:acayzaxxu34gv7nr2u8upj52fbuyhbsf06e2n1rjtb"
+  const nftFactoryProxyAddress: { [networkName: string]: string | undefined } = {
+    // "cfxtest": "cfxtest:acayzaxxu34gv7nr2u8upj52fbuyhbsf06e2n1rjtb"
   }
   // @ts-ignore
   const factoryTemplate = await deploy("NFTContractFactory");
   console.log("deployed factory", factoryTemplate.contractCreated);
 
   let proxy: any
-  if (nftFactoryProxyAddress[network.name] === "") {
+  if (nftFactoryProxyAddress[network.name] === undefined) {
     proxy = await deploy("Proxy1967", factoryTemplate.contractCreated);
-    console.log("Proxy deployed to %s, use NFTContractFactory template address %s", proxy.contractCreated, factoryTemplate.contractCreated);
+    // @ts-ignore
+    proxy = await conflux.getContractAt("Proxy1967", proxy.contractCreated);
+    console.log("Proxy deployed to %s, use NFTContractFactory template address %s", proxy.address, factoryTemplate.contractCreated);
   } else {
+    // @ts-ignore
     proxy = await conflux.getContractAt("Proxy1967", nftFactoryProxyAddress[network.name]);
     await proxy.upgradeTo(factoryTemplate.contractCreated)
       .sendTransaction({
@@ -34,6 +37,8 @@ async function main() {
 
   const erc1155Template = await deployErc1155custom()
   const erc721Template = await deployErc721custom()
+  console.log("Deployed erc721Template %s, erc1155Template %s", erc721Template.contractCreated, erc1155Template.contractCreated);
+  // @ts-ignore
   const factory = await conflux.getContractAt("NFTContractFactory", proxy.address)
   await factory.updateNftTemplates(erc721Template.contractCreated, erc1155Template.contractCreated)
     .sendTransaction({

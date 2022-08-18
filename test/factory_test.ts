@@ -108,4 +108,8 @@ describe("test factory", async function () {
         await erc721custom.mintToBatch([receiver.address], [3849589], ["721_uri"])
         await expect(erc721custom.connect(receiver).mintToBatch([receiver.address], [1], ["721_uri"])).to.be.reverted;
     })
+
+    it("test update template", async function () {
+        await deployAndSetTemplates();
+    })
 })

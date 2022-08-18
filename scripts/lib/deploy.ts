@@ -16,7 +16,9 @@ async function deployWithLibs(contractName: string, libs: FactoryOptions | null,
   // We get the contract to deploy
   // @ts-ignore
   const contract = libs === null ?
+    // @ts-ignore
     await conflux.getContractFactory(contractName) :
+    // @ts-ignore
     await conflux.getContractFactory(contractName, libs);
     
   const deployReceipt = await contract
