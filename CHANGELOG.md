@@ -7,6 +7,8 @@
 * Batch mint & transfer
 * TokenURI updatable
 * NFT enumerable
+* NFTContractFactory upgradable
+* Minimal Proxy for Erc721NFTCustom/Erc1155NFTCustom
 
 ## v0.1
 
