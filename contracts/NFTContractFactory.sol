@@ -2,17 +2,53 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./ERC721NFT.sol";
-import "./ERC721NFTCustom.sol";
-import "./ERC1155NFT.sol";
-import "./ERC1155NFTCustom.sol";
-// import "./lib/Config.sol";
+// import "./ERC721NFT.sol";
+// import "./ERC1155NFT.sol";
+// import "./ERC721NFTCustom.sol";
+// import "./ERC1155NFTCustom.sol";
+
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/access/IAccessControl.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
 import "@confluxfans/contracts/InternalContracts/InternalContractsLib.sol";
 import "@confluxfans/contracts/InternalContracts/SponsorWhitelistControl.sol";
 import "@confluxfans/contracts/utils/ERC1820Context.sol";
+
+import "@openzeppelin/contracts/proxy/Clones.sol";
+
+interface IGranularRoles {
+	function grantAdminRole(address user) external;
+
+	function grantMintRole(address user) external;
+}
+
+interface IERC721NFTCustomIniter is IGranularRoles {
+	function initialize(
+		string memory name_,
+		string memory symbol_,
+		string memory uri,
+		uint256 royaltiesBps,
+		address royaltiesAddress,
+		address[] memory owners,
+		bool tokensBurnable,
+		bool tokensTransferable,
+		uint256 transferCooldownTime_
+	) external;
+}
+
+interface IERC1155NFTCustomIniter is IGranularRoles {
+	function initialize(
+		string memory _name,
+		string memory _symbol,
+		string memory baseURI,
+		uint256 royaltiesBps,
+		address royaltiesAddress,
+		address[] memory owners,
+		bool tokensBurnable,
+		bool tokensTransferable
+	) external;
+}
 
 contract ConfluxHelper is ERC1820Context {
 	function setWhitelist(address targetContract, address user) public {
@@ -29,17 +65,16 @@ contract ConfluxHelper is ERC1820Context {
 contract NFTContractFactory is AccessControl, ConfluxHelper, Initializable {
 	bytes32 public constant ROLE_OWNER = keccak256("ROLE_OWNER");
 
+	address public erc721CustomImpl;
+	address public erc1155CustomImpl;
+
 	event ContractCreated(ContractType contractType, address contractAddress);
 
 	enum ContractType {
-		ERC721,
+		// ERC721,
 		ERC721Custom,
-		ERC1155,
+		// ERC1155,
 		ERC1155Custom
-	}
-
-	constructor() {
-		_grantRole(ROLE_OWNER, msg.sender);
 	}
 
 	function initialize() public initializer {
@@ -51,10 +86,9 @@ contract NFTContractFactory is AccessControl, ConfluxHelper, Initializable {
 		_grantRole(ROLE_OWNER, newOwner);
 	}
 
-	function newERC721(address subOwner) public onlyRole(ROLE_OWNER) {
-		address addr = address(new ERC721NFT(subOwner));
-		setWhitelist(addr, address(0));
-		emit ContractCreated(ContractType.ERC721, addr);
+	function updateNftTemplates(address _erc721CustomImpl, address _erc1155CustomImpl) public onlyRole(ROLE_OWNER) {
+		erc721CustomImpl = _erc721CustomImpl;
+		erc1155CustomImpl = _erc1155CustomImpl;
 	}
 
 	function newERC721Custom(
@@ -63,35 +97,26 @@ contract NFTContractFactory is AccessControl, ConfluxHelper, Initializable {
 		string memory baseURI,
 		uint256 royaltiesBps,
 		address royaltiesAddress,
-		address owner,
+		address[] memory owners,
 		bool tokensBurnable,
-		bool tokensTransferable
+		bool tokensTransferable,
+		uint256 transferCooldownTime
 	) public onlyRole(ROLE_OWNER) {
-		address addr = address(
-			new ERC721NFTCustom(
-				name,
-				symbol,
-				baseURI,
-				royaltiesBps,
-				royaltiesAddress,
-				owner,
-				tokensBurnable,
-				tokensTransferable
-			)
+		IERC721NFTCustomIniter instance = IERC721NFTCustomIniter(Clones.clone(erc721CustomImpl));
+		instance.initialize(
+			name,
+			symbol,
+			baseURI,
+			royaltiesBps,
+			royaltiesAddress,
+			owners,
+			tokensBurnable,
+			tokensTransferable,
+			transferCooldownTime
 		);
-		setWhitelist(addr, address(0));
-		emit ContractCreated(ContractType.ERC721Custom, address(addr));
-	}
-
-	function newERC1155(
-		string memory uri,
-		string memory name,
-		string memory symbol,
-		address subOwner
-	) public onlyRole(ROLE_OWNER) {
-		address addr = address(new ERC1155NFT(uri, name, symbol, subOwner));
-		setWhitelist(addr, address(0));
-		emit ContractCreated(ContractType.ERC1155, address(addr));
+		
+		setWhitelist(address(instance), address(0));
+		emit ContractCreated(ContractType.ERC721Custom, address(instance));
 	}
 
 	function newERC1155Custom(
@@ -100,23 +125,23 @@ contract NFTContractFactory is AccessControl, ConfluxHelper, Initializable {
 		string memory baseURI,
 		uint256 royaltiesBps,
 		address royaltiesAddress,
-		address owner,
+		address[] memory owners,
 		bool tokensBurnable,
 		bool tokensTransferable
 	) public onlyRole(ROLE_OWNER) {
-		address addr = address(
-			new ERC1155NFTCustom(
-				name,
-				symbol,
-				baseURI,
-				royaltiesBps,
-				royaltiesAddress,
-				owner,
-				tokensBurnable,
-				tokensTransferable
-			)
+		IERC1155NFTCustomIniter instance = IERC1155NFTCustomIniter(Clones.clone(erc1155CustomImpl));
+		instance.initialize(
+			name,
+			symbol,
+			baseURI,
+			royaltiesBps,
+			royaltiesAddress,
+			owners,
+			tokensBurnable,
+			tokensTransferable
 		);
-		setWhitelist(addr, address(0));
-		emit ContractCreated(ContractType.ERC1155Custom, address(addr));
+
+		setWhitelist(address(instance), address(0));
+		emit ContractCreated(ContractType.ERC1155Custom, address(instance));
 	}
 }

@@ -6,12 +6,13 @@ import { IERC2981 } from "@openzeppelin/contracts/interfaces/IERC2981.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@confluxfans/contracts/token/CRC1155/extensions/CRC1155Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155URIStorage.sol";
+import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
 // import "./lib/Config.sol";
 import "./lib/ConfigManager.sol";
 import "./lib/StringUtils.sol";
 
-contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager {
+contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager, Initializable {
 	using Strings for uint256;
 	using StringUtils for string;
 
@@ -21,49 +22,55 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 
 	event PermanentURI(string _value, uint256 indexed _id); // https://docs.opensea.io/docs/metadata-standards
 
-	constructor(
+	constructor() ERC1155("") {}
+
+	function initialize(
 		string memory _name,
 		string memory _symbol,
 		string memory baseURI,
 		uint256 royaltiesBps,
 		address royaltiesAddress,
-		address owner,
+		address[] memory owners,
 		bool tokensBurnable,
 		bool tokensTransferable
-	) ERC1155(baseURI) {
+	) public initializer {
+		super.initalize();
+		// _initRolesWithMsgSender(owner);
+		_initRoles(owners);
+		// grantAdminRole(msg.sender);
 		name = _name;
 		symbol = _symbol;
 		_setURI(baseURI);
-		_initRolesWithMsgSender(owner);
-		setTokensBurnable(tokensBurnable);
-		setTokensTransferable(tokensTransferable);
-		setRoyalties(royaltiesBps, royaltiesAddress);
+		_setTokensBurnable(tokensBurnable);
+		_setTokensTransferable(tokensTransferable);
+		_setRoyalties(royaltiesBps, royaltiesAddress);
 	}
 
-	function setURI(string memory _newURI) public onlyRole(ADMIN_ROLE) {
+	function setURI(string memory newURI) public onlyRole(ADMIN_ROLE) {
 		require(metadataUpdatable, "NFT: Token uris are frozen globally");
-		_setURI(_newURI);
+		_setURI(newURI);
 	}
 
 	function setURI(uint256 tokenId, string memory tokenUri) private {
 		require(metadataUpdatable, "NFT: Token uris are frozen globally");
+		require(!freezeTokenUris[tokenId], "NFT: Token is frozen");
 		_setURI(tokenId, tokenUri);
 		emit URI(tokenUri, tokenId);
 	}
 
-	function freezeTokenURI(uint256 _tokenId) public onlyRole(ADMIN_ROLE) {
+	function freezeTokenURI(uint256 tokenId) public onlyRole(ADMIN_ROLE) {
 		require(metadataUpdatable, "NFT: Token URIs are frozen globally");
-		require(!freezeTokenUris[_tokenId], "NFT: Token is frozen");
-		freezeTokenUris[_tokenId] = true;
-		emit PermanentURI(uri(_tokenId), _tokenId);
+		require(!freezeTokenUris[tokenId], "NFT: Token is frozen");
+		freezeTokenUris[tokenId] = true;
+		emit PermanentURI(uri(tokenId), tokenId);
 	}
 
-	function updateTokenURI(uint256 _tokenId, string memory _newUri) public onlyRole(ADMIN_ROLE) {
-		require(exists(_tokenId), "NFT: update URI query for nonexistent token");
+	function updateTokenURI(uint256 tokenId, string memory newUri) public onlyRole(ADMIN_ROLE) {
+		require(exists(tokenId), "NFT: update URI query for nonexistent token");
 		require(metadataUpdatable, "NFT: Token URIs are frozen globally");
-		require(!freezeTokenUris[_tokenId], "NFT: Token is frozen");
-		require(!_newUri.equals(uri(_tokenId)), "NFT: New token URI is same as updated");
-		setURI(_tokenId, _newUri);
+		require(!freezeTokenUris[tokenId], "NFT: Token is frozen");
+		require(!newUri.equals(uri(tokenId)), "NFT: New token URI is same as updated");
+		setURI(tokenId, newUri);
 	}
 
 	function burn(
@@ -125,10 +132,10 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 		string memory tokenUri
 	) internal {
 		revertIfUriConflict(id, tokenUri);
+		_mint(to, id, amount, "");
 		if (bytes(tokenUri).length > 0) {
 			setURI(id, tokenUri);
 		}
-		_mint(to, id, amount, "");
 	}
 
 	function mintTo(
@@ -175,6 +182,7 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 	function supportsInterface(bytes4 interfaceId)
 		public
 		view
+		virtual
 		override(CRC1155Enumerable, ERC1155, AccessControl)
 		returns (bool)
 	{
@@ -191,11 +199,11 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 		uint256[] memory ids,
 		uint256[] memory amounts,
 		bytes memory data
-	) internal override(CRC1155Enumerable, ERC1155) {
+	) internal virtual override(CRC1155Enumerable, ERC1155) {
 		CRC1155Enumerable._beforeTokenTransfer(operator, from, to, ids, amounts, data);
 	}
 
-	function uri(uint256 tokenId) public view override(ERC1155URIStorage, ERC1155) returns (string memory) {
+	function uri(uint256 tokenId) public view virtual override(ERC1155URIStorage, ERC1155) returns (string memory) {
 		return ERC1155URIStorage.uri(tokenId);
 	}
 }

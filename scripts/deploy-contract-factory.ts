@@ -1,15 +1,70 @@
 // eslint-disable-next-line node/no-missing-import
-import { deploy } from "./lib/deploy";
+import { deploy, deployWithLibs } from "./lib/deploy";
+// eslint-disable-next-line import/no-duplicates
+import { network } from "hardhat";
+// @ts-ignore
+// eslint-disable-next-line import/no-duplicates
+import { conflux } from "hardhat";
 
 async function main() {
-  // direct deploy
   // @ts-ignore
-  const factoryImpl = await deploy("NFTContractFactory");
-  // console.log("NFTContractFactory deployed to:", factoryImpl.contractCreated);
+  const accounts = await conflux.getSigners();
 
-  const nftFactory = await deploy("Proxy1967", factoryImpl.contractCreated);
-  console.log("NFTContractFactory deployed to:", nftFactory.contractCreated);
-  // deploy by factory
+  console.log("start");
+  const nftFactoryProxyAddress: { [networkName: string]: string } = {
+    "cfxtest": "cfxtest:acayzaxxu34gv7nr2u8upj52fbuyhbsf06e2n1rjtb"
+  }
+  // @ts-ignore
+  const factoryTemplate = await deploy("NFTContractFactory");
+  console.log("deployed factory", factoryTemplate.contractCreated);
+
+  let proxy: any
+  if (nftFactoryProxyAddress[network.name] === "") {
+    proxy = await deploy("Proxy1967", factoryTemplate.contractCreated);
+    console.log("Proxy deployed to %s, use NFTContractFactory template address %s", proxy.contractCreated, factoryTemplate.contractCreated);
+  } else {
+    proxy = await conflux.getContractAt("Proxy1967", nftFactoryProxyAddress[network.name]);
+    await proxy.upgradeTo(factoryTemplate.contractCreated)
+      .sendTransaction({
+        from: accounts[0].address,
+      })
+      .executed();
+    console.log("Upgrad NFTContractFactory template address %s", factoryTemplate.contractCreated);
+  }
+
+  const erc1155Template = await deployErc1155custom()
+  const erc721Template = await deployErc721custom()
+  const factory = await conflux.getContractAt("NFTContractFactory", proxy.address)
+  await factory.updateNftTemplates(erc721Template.contractCreated, erc1155Template.contractCreated)
+    .sendTransaction({
+      from: accounts[0].address,
+    })
+    .executed();
+  console.log("Initialize nft templates to:", erc721Template.contractCreated, erc1155Template.contractCreated);
+}
+
+async function deployErc1155custom(): Promise<{ contractCreated: string }> {
+  const stringUtils = await deploy("StringUtils");
+  // @ts-ignore
+  const impl = await deployWithLibs("ERC1155NFTCustom", {
+    libraries: {
+      StringUtils: stringUtils.contractCreated,
+    }
+  });
+  // impl.address = impl.contractCreated;
+  return impl
+}
+
+async function deployErc721custom(): Promise<{ contractCreated: string }> {
+  const stringUtils = await deploy("StringUtils");
+  // @ts-ignore
+  const impl = await deployWithLibs("ERC721NFTCustom", {
+    libraries: {
+      StringUtils: stringUtils.contractCreated,
+    }
+  });
+  // impl.address = impl.contractCreated;
+  return impl
 }
 
 // We recommend this pattern to be able to use async/await everywhere

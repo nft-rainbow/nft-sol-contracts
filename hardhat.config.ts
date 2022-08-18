@@ -61,10 +61,14 @@ const config: HardhatUserConfig = {
         runs: 200,
       },
     },
-  },
+},
   networks: {
+    hardhat: {
+      allowUnlimitedContractSize: true,
+    },
     cfxtest: {
       url: "https://test.confluxrpc.com",
+      allowUnlimitedContractSize: true,
       chainId: 1,
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],

@@ -10,4 +10,4 @@ artifacts
 
 tmp
 .DS_Store
-.vscode
+flatten_*.sol
