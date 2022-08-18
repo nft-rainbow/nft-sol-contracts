@@ -11,7 +11,7 @@ abstract contract GranularRoles is AccessControl {
 	mapping(bytes32 => bool) internal _rolesFrozen;
 
 	function initalize() internal virtual {
-		_setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+		_setupRole(DEFAULT_ADMIN_ROLE, tx.origin);
 		_setRoleAdmin(MINT_ROLE, ADMIN_ROLE);
 	}
 
