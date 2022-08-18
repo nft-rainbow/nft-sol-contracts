@@ -7,12 +7,11 @@ abstract contract GranularRoles is AccessControl {
 	// Roles list
 	bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
 	bytes32 public constant MINT_ROLE = keccak256("MINT_ROLE");
-	
+
 	mapping(bytes32 => bool) internal _rolesFrozen;
 
-
-	function initalize() virtual internal {
-		_setupRole(DEFAULT_ADMIN_ROLE,msg.sender);
+	function initalize() internal virtual {
+		_setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
 		_setRoleAdmin(MINT_ROLE, ADMIN_ROLE);
 	}
 
