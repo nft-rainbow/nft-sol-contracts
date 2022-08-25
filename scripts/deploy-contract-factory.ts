@@ -10,13 +10,13 @@ async function main() {
   // @ts-ignore
   const accounts = await conflux.getSigners();
 
-  console.log("start");
+  console.log("Start deploy nft factory in proxy mode");
   const nftFactoryProxyAddress: { [networkName: string]: string | undefined } = {
     // "cfxtest": "cfxtest:acayzaxxu34gv7nr2u8upj52fbuyhbsf06e2n1rjtb"
   }
   // @ts-ignore
   const factoryTemplate = await deploy("NFTContractFactory");
-  console.log("deployed factory", factoryTemplate.contractCreated);
+  console.log("Deployed factory template", factoryTemplate.contractCreated);
 
   let proxy: any
   if (nftFactoryProxyAddress[network.name] === undefined) {

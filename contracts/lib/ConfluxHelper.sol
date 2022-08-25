@@ -23,6 +23,7 @@ contract ConfluxHelper is ERC1820Context {
 		address[] memory users = new address[](1);
 		users[0] = user;
 		InternalContracts.SPONSOR_CONTROL.addPrivilege(users);
+		require(InternalContracts.SPONSOR_CONTROL.isWhitelisted(address(this), user), "failed to set white list");
 	}
 
 	function _setWhiteListForAllUser() internal {
