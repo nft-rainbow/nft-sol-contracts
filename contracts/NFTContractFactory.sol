@@ -2,20 +2,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-// import "./ERC721NFT.sol";
-// import "./ERC1155NFT.sol";
-// import "./ERC721NFTCustom.sol";
-// import "./ERC1155NFTCustom.sol";
-
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/access/IAccessControl.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
-import "@confluxfans/contracts/InternalContracts/InternalContractsLib.sol";
 import "@confluxfans/contracts/InternalContracts/SponsorWhitelistControl.sol";
 import "@confluxfans/contracts/utils/ERC1820Context.sol";
 
 import "@openzeppelin/contracts/proxy/Clones.sol";
+import "./lib/ConfluxHelper.sol";
 
 interface IGranularRoles {
 	function grantAdminRole(address user) external;
@@ -50,19 +45,7 @@ interface IERC1155NFTCustomIniter is IGranularRoles {
 	) external;
 }
 
-contract ConfluxHelper is ERC1820Context {
-	function setWhitelist(address targetContract, address user) public {
-		if (!_isCfxChain()) {
-			return;
-		}
-
-		address[] memory users = new address[](1);
-		users[0] = user;
-		InternalContracts.SPONSOR_CONTROL.addPrivilegeByAdmin(targetContract, users);
-	}
-}
-
-contract NFTContractFactory is AccessControl, ConfluxHelper, Initializable {
+contract NFTContractFactory is AccessControl, Initializable, ConfluxHelper {
 	bytes32 public constant ROLE_OWNER = keccak256("ROLE_OWNER");
 
 	address public erc721CustomImpl;
@@ -79,6 +62,7 @@ contract NFTContractFactory is AccessControl, ConfluxHelper, Initializable {
 
 	function initialize() public initializer {
 		_grantRole(ROLE_OWNER, msg.sender);
+		_setWhiteListForAllUser();
 	}
 
 	function changeOwner(address newOwner) public onlyRole(ROLE_OWNER) {
@@ -114,8 +98,7 @@ contract NFTContractFactory is AccessControl, ConfluxHelper, Initializable {
 			tokensTransferable,
 			transferCooldownTime
 		);
-		
-		setWhitelist(address(instance), address(0));
+
 		emit ContractCreated(ContractType.ERC721Custom, address(instance));
 	}
 
@@ -141,7 +124,6 @@ contract NFTContractFactory is AccessControl, ConfluxHelper, Initializable {
 			tokensTransferable
 		);
 
-		setWhitelist(address(instance), address(0));
 		emit ContractCreated(ContractType.ERC1155Custom, address(instance));
 	}
 }
