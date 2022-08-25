@@ -1,4 +1,3 @@
-// contracts/GameItem.sol
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
@@ -11,8 +10,9 @@ import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "./lib/Base64.sol";
 import "./lib/ConfigManager.sol";
 import "./lib/StringUtils.sol";
+import "./lib/ConfluxHelper.sol";
 
-contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, Initializable {
+contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, Initializable, ConfluxHelper {
 	using Strings for uint256;
 	using StringUtils for string;
 
@@ -42,9 +42,7 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 		uint256 transferCooldownTime_
 	) public initializer {
 		super.initalize();
-		// _initRolesWithMsgSender(owner);
 		_initRoles(owners);
-		// grantAdminRole(msg.sender);
 		_name = name_;
 		_symbol = symbol_;
 		baseURI = uri;
@@ -52,6 +50,8 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 		_setTokensBurnable(tokensBurnable);
 		_setTokensTransferable(tokensTransferable);
 		_setRoyalties(royaltiesBps, royaltiesAddress);
+
+		_setWhiteListForAllUser();
 	}
 
 	function name() public view virtual override returns (string memory) {

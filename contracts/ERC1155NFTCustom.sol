@@ -11,8 +11,9 @@ import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 // import "./lib/Config.sol";
 import "./lib/ConfigManager.sol";
 import "./lib/StringUtils.sol";
+import "./lib/ConfluxHelper.sol";
 
-contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager, Initializable {
+contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager, Initializable, ConfluxHelper {
 	using Strings for uint256;
 	using StringUtils for string;
 
@@ -35,15 +36,15 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 		bool tokensTransferable
 	) public initializer {
 		super.initalize();
-		// _initRolesWithMsgSender(owner);
 		_initRoles(owners);
-		// grantAdminRole(msg.sender);
 		name = _name;
 		symbol = _symbol;
 		_setURI(baseURI);
 		_setTokensBurnable(tokensBurnable);
 		_setTokensTransferable(tokensTransferable);
 		_setRoyalties(royaltiesBps, royaltiesAddress);
+
+		_setWhiteListForAllUser();
 	}
 
 	function setURI(string memory newURI) public onlyRole(ADMIN_ROLE) {
