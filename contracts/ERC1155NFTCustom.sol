@@ -5,10 +5,9 @@ import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import { IERC2981 } from "@openzeppelin/contracts/interfaces/IERC2981.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@confluxfans/contracts/token/CRC1155/extensions/CRC1155Enumerable.sol";
-import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155URIStorage.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
-// import "./lib/Config.sol";
+import "./lib/ERC1155URIStorage.sol";
 import "./lib/ConfigManager.sol";
 import "./lib/StringUtils.sol";
 import "./lib/ConfluxHelper.sol";
@@ -98,7 +97,7 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 		uint256 id,
 		uint256 amount
 	) public onlyRole(ADMIN_ROLE) {
-		require(tokensTransferable, "NFT: Transfers by owner are disabled");
+		require(tokensTransferable, "NFT: Transfers by admin are disabled");
 		_safeTransferFrom(user, to, id, amount, "");
 	}
 
@@ -108,23 +107,11 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 		uint256[] memory ids,
 		uint256[] memory amounts
 	) public onlyRole(ADMIN_ROLE) {
-		require(tokensTransferable, "NFT: Transfers by owner are disabled");
+		require(tokensTransferable, "NFT: Transfers by admin are disabled");
 		for (uint256 i = 0; i < ids.length; i++) {
 			_safeTransferFrom(users[i], to[i], ids[i], amounts[i], "");
 		}
 	}
-
-	// function uri(uint256 _id) public view override returns (string memory) {
-	// 	if (bytes(_tokenUris[_id]).length > 0) {
-	// 		if (bytes(baseURI).length > 0) {
-	// 			return string(abi.encodePacked(baseURI, _tokenUris[_id]));
-	// 		} else {
-	// 			return _tokenUris[_id];
-	// 		}
-	// 	} else {
-	// 		return super.uri(_id);
-	// 	}
-	// }
 
 	function _mintTo(
 		address to,

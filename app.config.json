@@ -1,0 +1,10 @@
+{
+    "nftFactoryProxyAddress": {
+        "cfxtest": "cfxtest:ach4wmgug7f5yuhwksxyxp50eeu7y3981eh6nt5fj3",
+        "cfx": "cfx:acf2rcsh8payyxpg6xj7b0ztswwh81ute60tsw35j7"
+    },
+    "StringUtils":{
+        "cfxtest": "",
+        "cfx": ""
+    }
+}

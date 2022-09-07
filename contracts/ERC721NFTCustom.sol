@@ -2,11 +2,10 @@
 pragma solidity ^0.8.0;
 
 import { IERC2981 } from "@openzeppelin/contracts/interfaces/IERC2981.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@confluxfans/contracts/token/CRC721/extensions/CRC721Enumerable.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
+import "./lib/ERC721URIStorage.sol";
 import "./lib/Base64.sol";
 import "./lib/ConfigManager.sol";
 import "./lib/StringUtils.sol";
@@ -118,7 +117,7 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 		address to,
 		uint256 id
 	) public onlyRole(ADMIN_ROLE) {
-		require(tokensTransferable, "NFT: Transfers by owner are disabled");
+		require(tokensTransferable, "NFT: Transfers by admin are disabled");
 		_safeTransfer(user, to, id, "");
 	}
 
@@ -127,7 +126,7 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 		address[] memory to,
 		uint256[] memory ids
 	) public onlyRole(ADMIN_ROLE) {
-		require(tokensTransferable, "NFT: Transfers by owner are disabled");
+		require(tokensTransferable, "NFT: Transfers by admin are disabled");
 		for (uint256 i = 0; i < ids.length; i++) {
 			_safeTransfer(users[i], to[i], ids[i], "");
 		}
