@@ -13,3 +13,4 @@ tmp
 flatten_*.sol
 dist
 .vscode
+app.config.json
