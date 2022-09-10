@@ -28,7 +28,7 @@ async function deploy(
         }
     });
     const nft = await NFT.deploy();
-    await nft.initialize("NFT RAINBOW URI", "NFT RAINBOW", "NFT", 200, owner.address, [owner.address, admin.address], true, true)
+    await nft.initialize("NFT RAINBOW URI", "NFT RAINBOW", "http://BASE_URI_1155_CUSTOM/{id}.json", 200, owner.address, [owner.address, admin.address], true, true)
     return nft as ERC1155NFTCustom
 };
 
@@ -64,7 +64,7 @@ describe("test erc1155custom", async function () {
         await expect(nft.connect(stranger1)["mintTo(address,uint256,uint256,string)"](stranger1.address, 3, 10, "url_1")).to.be.reverted;
     })
 
-    it("totoal supply should be right", async function () {
+    it("totoal supply should be correct", async function () {
         // deploy
         const nft = await deploy()
 
@@ -100,6 +100,14 @@ describe("test erc1155custom", async function () {
         expect(await nft["totalSupply(uint256)"](1)).equal(0);
         expect(await nft["totalSupply(uint256)"](2)).equal(5);
         expect(await nft["totalSupply(uint256)"](3)).equal(10);
+    });
+
+    it("token uri should be correct", async function () {
+        // deploy
+        const nft = await deploy()
+        await nft["mintTo(address,uint256,uint256,string)"](stranger1.address, 1, 10, "url_1")
+        expect(await nft.uri(1)).equal("url_1")
+        expect(await nft.uri(2)).equal("http://BASE_URI_1155_CUSTOM/{id}.json")
     });
 
     after(function () { });

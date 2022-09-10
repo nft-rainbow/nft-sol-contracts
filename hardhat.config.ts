@@ -61,13 +61,13 @@ const config: HardhatUserConfig = {
         runs: 200,
       },
     },
-},
+  },
   networks: {
     hardhat: {
       allowUnlimitedContractSize: true,
     },
     cfxtest: {
-      url: "https://test.confluxrpc.com",
+      url: "https://test.confluxrpc.com/217e4c7802",
       allowUnlimitedContractSize: true,
       chainId: 1,
       accounts:

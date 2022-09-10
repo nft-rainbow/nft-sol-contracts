@@ -11,4 +11,6 @@ artifacts
 tmp
 .DS_Store
 flatten_*.sol
+dist
 .vscode
+app.config.json

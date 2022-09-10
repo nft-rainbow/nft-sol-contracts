@@ -2,8 +2,7 @@
 // @ts-ignore
 import { conflux } from "hardhat";
 // @ts-ignore
-// eslint-disable-next-line node/no-missing-import
-import { FactoryOptions } from "hardhat-conflux/types"
+import { FactoryOptions} from "hardhat-conflux"
 
 
 async function deploy(contractName: string, ...args: any[]): Promise<any> {
