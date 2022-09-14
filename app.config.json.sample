@@ -1,0 +1,10 @@
+{
+    "nftFactoryProxyAddress": {
+        "cfxtest": "",
+        "cfx": ""
+    },
+    "StringUtils":{
+        "cfxtest": "",
+        "cfx": ""
+    }
+}
