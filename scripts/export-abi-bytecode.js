@@ -1,17 +1,10 @@
 const fs = require("fs");
 const path = require("path");
 
-function exportDatas(target) {
+function exportDatas(source, target, wants) {
   fs.mkdirSync(target, { recursive: true });
-  const wants = [
-    "ERC1155NFT.sol",
-    "ERC1155NFTCustom.sol",
-    "ERC721NFT.sol",
-    "ERC721NFTCustom.sol",
-    "NFTContractFactory.sol",
-  ];
-
-  const folder = path.join(__dirname, "../artifacts/contracts");
+  
+  const folder = path.join(__dirname, source);
   for (let i = 0; i < wants.length; i++) {
     const data = require(path.join(
       folder,
@@ -29,4 +22,14 @@ function exportDatas(target) {
   }
 }
 
-exportDatas(process.argv[2]);
+exportDatas("../artifacts/contracts", process.argv[2], [
+  "ERC1155NFT.sol",
+  "ERC1155NFTCustom.sol",
+  "ERC721NFT.sol",
+  "ERC721NFTCustom.sol",
+  "NFTContractFactory.sol",
+]);
+exportDatas("../artifacts/@confluxfans/contracts/InternalContracts", process.argv[2], ["AdminControl.sol",
+  "SponsorWhitelistControl.sol"
+]);
+
