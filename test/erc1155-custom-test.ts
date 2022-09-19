@@ -28,7 +28,7 @@ async function deploy(
         }
     });
     const nft = await NFT.deploy();
-    await nft.initialize("NFT RAINBOW URI", "NFT RAINBOW", "http://BASE_URI_1155_CUSTOM/{id}.json", 200, owner.address, [owner.address, admin.address], true, true)
+    await nft.initialize("NFT RAINBOW URI", "NFT RAINBOW", "http://BASE_URI_1155_CUSTOM/{id}.json", 200, owner.address, [owner.address, admin.address], true, true, true)
     return nft as ERC1155NFTCustom
 };
 

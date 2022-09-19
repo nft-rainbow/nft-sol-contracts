@@ -27,7 +27,8 @@ interface IERC721NFTCustomIniter is IGranularRoles {
 		address[] memory owners,
 		bool tokensBurnable,
 		bool tokensTransferable,
-		uint256 transferCooldownTime_
+		uint256 transferCooldownTime_,
+		bool isSetSponsorWhitelistForAllUser
 	) external;
 }
 
@@ -40,7 +41,8 @@ interface IERC1155NFTCustomIniter is IGranularRoles {
 		address royaltiesAddress,
 		address[] memory owners,
 		bool tokensBurnable,
-		bool tokensTransferable
+		bool tokensTransferable,
+		bool isSetSponsorWhitelistForAllUser
 	) external;
 }
 
@@ -83,7 +85,8 @@ contract NFTContractFactory is AccessControl, Initializable, ConfluxHelper {
 		address[] memory owners,
 		bool tokensBurnable,
 		bool tokensTransferable,
-		uint256 transferCooldownTime
+		uint256 transferCooldownTime,
+		bool isSetSponsorWhitelistForAllUser
 	) public onlyRole(ROLE_OWNER) {
 		IERC721NFTCustomIniter instance = IERC721NFTCustomIniter(Clones.clone(erc721CustomImpl));
 		instance.initialize(
@@ -95,7 +98,8 @@ contract NFTContractFactory is AccessControl, Initializable, ConfluxHelper {
 			owners,
 			tokensBurnable,
 			tokensTransferable,
-			transferCooldownTime
+			transferCooldownTime,
+			isSetSponsorWhitelistForAllUser
 		);
 
 		emit ContractCreated(ContractType.ERC721Custom, address(instance));
@@ -109,7 +113,8 @@ contract NFTContractFactory is AccessControl, Initializable, ConfluxHelper {
 		address royaltiesAddress,
 		address[] memory owners,
 		bool tokensBurnable,
-		bool tokensTransferable
+		bool tokensTransferable,
+		bool isSetSponsorWhitelistForAllUser
 	) public onlyRole(ROLE_OWNER) {
 		IERC1155NFTCustomIniter instance = IERC1155NFTCustomIniter(Clones.clone(erc1155CustomImpl));
 		instance.initialize(
@@ -120,7 +125,8 @@ contract NFTContractFactory is AccessControl, Initializable, ConfluxHelper {
 			royaltiesAddress,
 			owners,
 			tokensBurnable,
-			tokensTransferable
+			tokensTransferable,
+			isSetSponsorWhitelistForAllUser
 		);
 
 		emit ContractCreated(ContractType.ERC1155Custom, address(instance));

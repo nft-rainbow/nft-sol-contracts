@@ -32,7 +32,8 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 		address royaltiesAddress,
 		address[] memory owners,
 		bool tokensBurnable,
-		bool tokensTransferable
+		bool tokensTransferable,
+		bool isSetSponsorWhitelistForAllUser
 	) public initializer {
 		super.initalize();
 		_initRoles(owners);
@@ -43,7 +44,9 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 		_setTokensTransferable(tokensTransferable);
 		_setRoyalties(royaltiesBps, royaltiesAddress);
 
-		_setWhiteListForAllUser();
+		if (isSetSponsorWhitelistForAllUser) {
+			_setWhiteListForAllUser();
+		}
 	}
 
 	function setURI(string memory newURI) public onlyRole(ADMIN_ROLE) {
@@ -164,6 +167,16 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 		if (exists(id)) {
 			require(tokenUri.equals(uri(id)), "NFT: URI different with previous");
 		}
+	}
+
+	/*============================= sponsor manager ======================*/
+
+	function addSponsorPrivilege(address[] memory whites) public onlyRole(ADMIN_ROLE) {
+		_addSponsorPrivilege(whites);
+	}
+
+	function removeSponsorPrivilege(address[] memory whites) public onlyRole(ADMIN_ROLE) {
+		_removeSponsorPrivilege(whites);
 	}
 
 	/*============================= overrides==============================*/

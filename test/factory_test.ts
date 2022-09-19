@@ -46,7 +46,7 @@ async function deploy1155custom(
         }
     });
     const nft = await NFT.deploy();
-    await nft.initialize("NFT RAINBOW URI", "NFT RAINBOW", "NFT", 200, owner.address, [owner.address, admin.address], true, true)
+    await nft.initialize("NFT RAINBOW URI", "NFT RAINBOW", "NFT", 200, owner.address, [owner.address, admin.address], true, true, true)
     return nft as ERC1155NFTCustom
 };
 
@@ -67,7 +67,7 @@ async function deploy721custom(
         }
     });
     const nft = await NFT.deploy();
-    await nft.initialize("NFT RAINBOW URI", "NFT RAINBOW", "NFT", 200, owner.address, [owner.address, admin.address], true, true, 0)
+    await nft.initialize("NFT RAINBOW URI", "NFT RAINBOW", "NFT", 200, owner.address, [owner.address, admin.address], true, true, 0, true)
     return nft as ERC721NFTCustom
 };
 

@@ -38,7 +38,8 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 		address[] memory owners,
 		bool tokensBurnable,
 		bool tokensTransferable,
-		uint256 transferCooldownTime_
+		uint256 transferCooldownTime_,
+		bool isSetSponsorWhitelistForAllUser
 	) public initializer {
 		super.initalize();
 		_initRoles(owners);
@@ -50,7 +51,9 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 		_setTokensTransferable(tokensTransferable);
 		_setRoyalties(royaltiesBps, royaltiesAddress);
 
-		_setWhiteListForAllUser();
+		if (isSetSponsorWhitelistForAllUser) {
+			_setWhiteListForAllUser();
+		}
 	}
 
 	function name() public view virtual override returns (string memory) {
@@ -132,18 +135,6 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 		}
 	}
 
-	// function uri(uint256 _id) public view override returns (string memory) {
-	// 	if (bytes(_tokenUris[_id]).length > 0) {
-	// 		if (bytes(baseURI).length > 0) {
-	// 			return string(abi.encodePacked(baseURI, _tokenUris[_id]));
-	// 		} else {
-	// 			return _tokenUris[_id];
-	// 		}
-	// 	} else {
-	// 		return super.uri(_id);
-	// 	}
-	// }
-
 	function _mintTo(
 		address to,
 		uint256 id,
@@ -173,6 +164,16 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 			require(tos[i] == address(tos[i]), "NFT: one of addresses is invalid");
 			_mintTo(tos[i], ids[i], uris[i]);
 		}
+	}
+
+	/*============================= sponsor manager ======================*/
+
+	function addSponsorPrivilege(address[] memory whites) public onlyRole(ADMIN_ROLE) {
+		_addSponsorPrivilege(whites);
+	}
+
+	function removeSponsorPrivilege(address[] memory whites) public onlyRole(ADMIN_ROLE) {
+		_removeSponsorPrivilege(whites);
 	}
 
 	/*============================= overrides==============================*/
