@@ -3,8 +3,9 @@ pragma solidity ^0.8.0;
 
 import "@confluxfans/contracts/utils/ERC1820Context.sol";
 import "@confluxfans/contracts/InternalContracts/InternalContractsLib.sol";
-import "./GranularRoles.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
+import "./Constants.sol";
 
 contract ConfluxHelper is ERC1820Context, AccessControl {
 	using EnumerableSet for EnumerableSet.AddressSet;
@@ -12,20 +13,7 @@ contract ConfluxHelper is ERC1820Context, AccessControl {
 	address public constant ZERO = address(0);
 	EnumerableSet.AddressSet sponsorWhitelist;
 
-	function _setWhitelistByAdmin(address targetContract, address user) internal {
-		if (!_isCfxChain()) {
-			return;
-		}
-
-		address[] memory users = new address[](1);
-		users[0] = user;
-		InternalContracts.SPONSOR_CONTROL.addPrivilegeByAdmin(targetContract, users);
-	}
-
 	function _setWhiteListForUser(address user) internal {
-		if (!_isCfxChain()) {
-			return;
-		}
 		address[] memory users = new address[](1);
 		users[0] = user;
 		_addSponsorPrivilege(users);
@@ -58,8 +46,11 @@ contract ConfluxHelper is ERC1820Context, AccessControl {
 		if (!_isCfxChain()) {
 			return;
 		}
+		for (uint256 i = 0; i < whites.length; i++) {
+		}
 		InternalContracts.SPONSOR_CONTROL.removePrivilege(whites);
 		for (uint256 i = 0; i < whites.length; i++) {
+			require(!hasRole(Constants.ADMIN_ROLE, whites[i]), "NFT: could not remove admin");
 			sponsorWhitelist.remove(whites[i]);
 		}
 	}

@@ -1,5 +1,7 @@
 import { deployOrUpdateNftFactoryTemplate, updateTemplates } from "../lib/contract-factory"
 import { Command } from 'commander';
+import * as dotenv from 'dotenv';
+dotenv.config()
 
 const program = new Command();
 

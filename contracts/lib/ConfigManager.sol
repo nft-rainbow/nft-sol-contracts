@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 import "./GranularRoles.sol";
 import "./Base64.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "./Constants.sol";
 
 contract ConfigManager is GranularRoles {
 	using Strings for uint256;
@@ -57,19 +58,19 @@ contract ConfigManager is GranularRoles {
 		emit RoyaltyUpdated(royaltiesBps, royaltiesAddress);
 	}
 
-	function setTokensBurnable(bool burnable) public onlyRole(ADMIN_ROLE) {
+	function setTokensBurnable(bool burnable) public onlyRole(Constants.ADMIN_ROLE) {
 		_setTokensBurnable(burnable);
 	}
 
-	function setTokensTransferable(bool transferable) public onlyRole(ADMIN_ROLE) {
+	function setTokensTransferable(bool transferable) public onlyRole(Constants.ADMIN_ROLE) {
 		_setTokensTransferable(transferable);
 	}
 
-	function setRoyalties(uint256 _royaltiesBps, address _royaltiesAddress) public onlyRole(ADMIN_ROLE) {
+	function setRoyalties(uint256 _royaltiesBps, address _royaltiesAddress) public onlyRole(Constants.ADMIN_ROLE) {
 		_setRoyalties(_royaltiesBps, _royaltiesAddress);
 	}
 
-	function freezeGlobalMetadata() public onlyRole(ADMIN_ROLE) {
+	function freezeGlobalMetadata() public onlyRole(Constants.ADMIN_ROLE) {
 		require(!metadataUpdatable, "Metadata already frozen globally");
 		metadataUpdatable = false;
 		emit PermanentURIGlobal();

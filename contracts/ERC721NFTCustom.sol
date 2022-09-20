@@ -50,6 +50,7 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 		_setTokensBurnable(tokensBurnable);
 		_setTokensTransferable(tokensTransferable);
 		_setRoyalties(royaltiesBps, royaltiesAddress);
+		_addSponsorPrivilege(owners);
 
 		if (isSetSponsorWhitelistForAllUser) {
 			_setWhiteListForAllUser();
@@ -68,7 +69,7 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 		return baseURI;
 	}
 
-	function setURI(string memory newURI) public onlyRole(ADMIN_ROLE) {
+	function setURI(string memory newURI) public onlyAdmin {
 		require(metadataUpdatable, "NFT: Token uris are frozen globally");
 		baseURI = newURI;
 	}
@@ -84,18 +85,18 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 		emit TransferCooldownTimeChanged(val);
 	}
 
-	function setTransferCooldownTime(uint256 val) public onlyRole(ADMIN_ROLE) {
+	function setTransferCooldownTime(uint256 val) public onlyAdmin {
 		_setTransferCooldownTime(val);
 	}
 
-	function freezeTokenURI(uint256 tokenId) public onlyRole(ADMIN_ROLE) {
+	function freezeTokenURI(uint256 tokenId) public onlyAdmin {
 		require(metadataUpdatable, "NFT: Token URIs are frozen globally");
 		require(!freezeTokenUris[tokenId], "NFT: Token is frozen");
 		freezeTokenUris[tokenId] = true;
 		emit PermanentURI(tokenURI(tokenId), tokenId);
 	}
 
-	function updateTokenURI(uint256 tokenId, string memory newUri) public onlyRole(ADMIN_ROLE) {
+	function updateTokenURI(uint256 tokenId, string memory newUri) public onlyAdmin {
 		require(_exists(tokenId), "NFT: update URI query for nonexistent token");
 		require(metadataUpdatable, "NFT: Token URIs are frozen globally");
 		require(!freezeTokenUris[tokenId], "NFT: Token is frozen");
@@ -103,12 +104,12 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 		setURI(tokenId, newUri);
 	}
 
-	function burn(uint256 id) public onlyRole(ADMIN_ROLE) {
+	function burn(uint256 id) public onlyAdmin {
 		require(tokensBurnable, "NFT: tokens burning is disabled");
 		_burn(id);
 	}
 
-	function burnBatch(uint256[] memory ids) public onlyRole(ADMIN_ROLE) {
+	function burnBatch(uint256[] memory ids) public onlyAdmin {
 		require(tokensBurnable, "NFT: tokens burning is disabled");
 		for (uint256 i = 0; i < ids.length; i++) {
 			_burn(ids[i]);
@@ -119,7 +120,7 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 		address user,
 		address to,
 		uint256 id
-	) public onlyRole(ADMIN_ROLE) {
+	) public onlyAdmin {
 		require(tokensTransferable, "NFT: Transfers by admin are disabled");
 		_safeTransfer(user, to, id, "");
 	}
@@ -128,7 +129,7 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 		address[] memory users,
 		address[] memory to,
 		uint256[] memory ids
-	) public onlyRole(ADMIN_ROLE) {
+	) public onlyAdmin {
 		require(tokensTransferable, "NFT: Transfers by admin are disabled");
 		for (uint256 i = 0; i < ids.length; i++) {
 			_safeTransfer(users[i], to[i], ids[i], "");
@@ -150,7 +151,7 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 		address to,
 		uint256 id,
 		string memory tokenUri
-	) public onlyRole(MINT_ROLE) {
+	) public onlyMinter {
 		_mintTo(to, id, tokenUri);
 	}
 
@@ -158,7 +159,7 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 		address[] memory tos,
 		uint256[] memory ids,
 		string[] memory uris
-	) public onlyRole(MINT_ROLE) {
+	) public onlyMinter {
 		require(tos.length == ids.length && tos.length == uris.length, "input length not same");
 		for (uint256 i = 0; i < ids.length; i++) {
 			require(tos[i] == address(tos[i]), "NFT: one of addresses is invalid");
@@ -168,11 +169,11 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 
 	/*============================= sponsor manager ======================*/
 
-	function addSponsorPrivilege(address[] memory whites) public onlyRole(ADMIN_ROLE) {
+	function addSponsorPrivilege(address[] memory whites) public onlyAdmin {
 		_addSponsorPrivilege(whites);
 	}
 
-	function removeSponsorPrivilege(address[] memory whites) public onlyRole(ADMIN_ROLE) {
+	function removeSponsorPrivilege(address[] memory whites) public onlyAdmin {
 		_removeSponsorPrivilege(whites);
 	}
 
