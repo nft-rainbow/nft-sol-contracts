@@ -25,7 +25,10 @@ contract ConfigManager is GranularRoles {
 	// NFTs minted in this contract are frozen by default which means token URIs are non-updatable.
 	bool public metadataUpdatable;
 	// If true, tokens may be transferred by owner. Default is true. Can be only changed to false.
-	bool public tokensTransferable;
+	bool public tokensTransferableByAdmin;
+	// If true, tokens may be transferred by user. Default is true. Can be only changed to false or true.
+	bool public tokensTransferableByUser;
+
 	// Secondary market royalties in basis points (100 bps = 1%)
 	uint256 public royaltiesBps;
 	// Address for royalties
@@ -33,13 +36,14 @@ contract ConfigManager is GranularRoles {
 
 	event PermanentURIGlobal();
 	event BurnableChanged(bool burnable);
-	event TransferableChanged(bool transferable);
+	event TransferableChanged(bool transferableByAdmin,bool transferableByUser);
 	event RoyaltyUpdated(uint256 royaltiesBps, address royaltiesAddress);
 
 	function initalize() internal virtual override {
 		super.initalize();
 		metadataUpdatable = true;
-		tokensTransferable = true;
+		tokensTransferableByAdmin = true;
+		tokensTransferableByUser = true;
 	}
 
 	function _setTokensBurnable(bool burnable) internal {
@@ -47,9 +51,10 @@ contract ConfigManager is GranularRoles {
 		emit BurnableChanged(burnable);
 	}
 
-	function _setTokensTransferable(bool transferable) internal {
-		tokensTransferable = transferable;
-		emit TransferableChanged(transferable);
+	function _setTokensTransferable(bool transferableByAdmin, bool transferableByUser) internal {
+		tokensTransferableByAdmin = transferableByAdmin;
+		tokensTransferableByUser = transferableByUser;
+		emit TransferableChanged(transferableByAdmin, transferableByUser);
 	}
 
 	function _setRoyalties(uint256 _royaltiesBps, address _royaltiesAddress) internal {
@@ -62,8 +67,11 @@ contract ConfigManager is GranularRoles {
 		_setTokensBurnable(burnable);
 	}
 
-	function setTokensTransferable(bool transferable) public onlyRole(Constants.ADMIN_ROLE) {
-		_setTokensTransferable(transferable);
+	function setTokensTransferable(bool transferableByAdmin, bool transferableByUser) public onlyRole(Constants.ADMIN_ROLE) {
+		if (transferableByAdmin){
+			require(tokensTransferableByAdmin,"transfer by admin can be only changed to false");
+		}
+		_setTokensTransferable(transferableByAdmin,transferableByUser);
 	}
 
 	function setRoyalties(uint256 _royaltiesBps, address _royaltiesAddress) public onlyRole(Constants.ADMIN_ROLE) {

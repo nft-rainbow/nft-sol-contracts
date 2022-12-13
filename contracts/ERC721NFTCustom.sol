@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 import { IERC2981 } from "@openzeppelin/contracts/interfaces/IERC2981.sol";
 import "@confluxfans/contracts/token/CRC721/extensions/CRC721Enumerable.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import "hardhat/console.sol";
 
 import "./lib/ERC721URIStorage.sol";
 import "./lib/Base64.sol";
@@ -37,7 +38,8 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 		address royaltiesAddress,
 		address[] memory owners,
 		bool tokensBurnable,
-		bool tokensTransferable,
+		bool tokensTransferableByAdmin,
+		bool tokensTransferableByUser,
 		uint256 transferCooldownTime_,
 		bool isSetSponsorWhitelistForAllUser
 	) public initializer {
@@ -48,7 +50,7 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 		baseURI = uri;
 		_setTransferCooldownTime(transferCooldownTime_);
 		_setTokensBurnable(tokensBurnable);
-		_setTokensTransferable(tokensTransferable);
+		_setTokensTransferable(tokensTransferableByAdmin, tokensTransferableByUser);
 		_setRoyalties(royaltiesBps, royaltiesAddress);
 		_addSponsorPrivilege(owners);
 
@@ -116,50 +118,30 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 		}
 	}
 
-	function transferByAdmin(
-		address user,
-		address to,
-		uint256 id
-	) public onlyAdmin {
-		require(tokensTransferable, "NFT: Transfers by admin are disabled");
+	function transferByAdmin(address user, address to, uint256 id) public onlyAdmin {
+		require(tokensTransferableByAdmin, "NFT: Transfers by admin are disabled");
 		_safeTransfer(user, to, id, "");
 	}
 
-	function transferBatchByAdmin(
-		address[] memory users,
-		address[] memory to,
-		uint256[] memory ids
-	) public onlyAdmin {
-		require(tokensTransferable, "NFT: Transfers by admin are disabled");
+	function transferBatchByAdmin(address[] memory users, address[] memory to, uint256[] memory ids) public onlyAdmin {
+		require(tokensTransferableByAdmin, "NFT: Transfers by admin are disabled");
 		for (uint256 i = 0; i < ids.length; i++) {
 			_safeTransfer(users[i], to[i], ids[i], "");
 		}
 	}
 
-	function _mintTo(
-		address to,
-		uint256 id,
-		string memory tokenUri
-	) internal {
+	function _mintTo(address to, uint256 id, string memory tokenUri) internal {
 		_mint(to, id);
 		if (bytes(tokenUri).length > 0) {
 			setURI(id, tokenUri);
 		}
 	}
 
-	function mintTo(
-		address to,
-		uint256 id,
-		string memory tokenUri
-	) public onlyMinter {
+	function mintTo(address to, uint256 id, string memory tokenUri) public onlyMinter {
 		_mintTo(to, id, tokenUri);
 	}
 
-	function mintToBatch(
-		address[] memory tos,
-		uint256[] memory ids,
-		string[] memory uris
-	) public onlyMinter {
+	function mintToBatch(address[] memory tos, uint256[] memory ids, string[] memory uris) public onlyMinter {
 		require(tos.length == ids.length && tos.length == uris.length, "input length not same");
 		for (uint256 i = 0; i < ids.length; i++) {
 			require(tos[i] == address(tos[i]), "NFT: one of addresses is invalid");
@@ -178,13 +160,9 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 	}
 
 	/*============================= overrides==============================*/
-	function supportsInterface(bytes4 interfaceId)
-		public
-		view
-		virtual
-		override(ERC721Enumerable, ERC721, AccessControl)
-		returns (bool)
-	{
+	function supportsInterface(
+		bytes4 interfaceId
+	) public view virtual override(ERC721Enumerable, ERC721, AccessControl) returns (bool) {
 		return
 			ERC721.supportsInterface(interfaceId) ||
 			ERC721Enumerable.supportsInterface(interfaceId) ||
@@ -200,6 +178,13 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 		if (from != address(0) && to != address(0)) {
 			require(block.timestamp - lastTransferTimes[tokenId] >= transferCooldownTime, "Now on cooldown time");
 			lastTransferTimes[tokenId] = block.timestamp;
+		}
+
+		if (from != address(0)) {
+			bool isAdminAndEnable = isAdmin() && tokensTransferableByAdmin;
+			bool isUserAndEnable = _isApprovedOrOwner(_msgSender(), tokenId) && tokensTransferableByUser;
+			console.log("isAdminAndEnable %s, isUserAndEnable %s", isAdminAndEnable, isUserAndEnable);
+			require(isAdminAndEnable || isUserAndEnable, "ERC721NFTCustom: no permission");
 		}
 		ERC721Enumerable._beforeTokenTransfer(from, to, tokenId);
 	}

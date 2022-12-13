@@ -26,7 +26,8 @@ interface IERC721NFTCustomIniter is IGranularRoles {
 		address royaltiesAddress,
 		address[] memory owners,
 		bool tokensBurnable,
-		bool tokensTransferable,
+		bool tokensTransferableByAdmin,
+		bool tokensTransferableByUser,
 		uint256 transferCooldownTime_,
 		bool isSetSponsorWhitelistForAllUser
 	) external;
@@ -41,7 +42,8 @@ interface IERC1155NFTCustomIniter is IGranularRoles {
 		address royaltiesAddress,
 		address[] memory owners,
 		bool tokensBurnable,
-		bool tokensTransferable,
+		bool tokensTransferableByAdmin,
+		bool tokensTransferableByUser,
 		bool isSetSponsorWhitelistForAllUser
 	) external;
 }
@@ -84,7 +86,8 @@ contract NFTContractFactory is AccessControl, Initializable, ConfluxHelper {
 		address royaltiesAddress,
 		address[] memory owners,
 		bool tokensBurnable,
-		bool tokensTransferable,
+		bool tokensTransferableByAdmin,
+		bool tokensTransferableByUser,
 		uint256 transferCooldownTime,
 		bool isSetSponsorWhitelistForAllUser
 	) public onlyRole(ROLE_OWNER) {
@@ -97,7 +100,8 @@ contract NFTContractFactory is AccessControl, Initializable, ConfluxHelper {
 			royaltiesAddress,
 			owners,
 			tokensBurnable,
-			tokensTransferable,
+			tokensTransferableByAdmin,
+			tokensTransferableByUser,
 			transferCooldownTime,
 			isSetSponsorWhitelistForAllUser
 		);
@@ -113,7 +117,8 @@ contract NFTContractFactory is AccessControl, Initializable, ConfluxHelper {
 		address royaltiesAddress,
 		address[] memory owners,
 		bool tokensBurnable,
-		bool tokensTransferable,
+		bool tokensTransferableByAdmin,
+		bool tokensTransferableByUser,
 		bool isSetSponsorWhitelistForAllUser
 	) public onlyRole(ROLE_OWNER) {
 		IERC1155NFTCustomIniter instance = IERC1155NFTCustomIniter(Clones.clone(erc1155CustomImpl));
@@ -125,7 +130,8 @@ contract NFTContractFactory is AccessControl, Initializable, ConfluxHelper {
 			royaltiesAddress,
 			owners,
 			tokensBurnable,
-			tokensTransferable,
+			tokensTransferableByAdmin,
+			tokensTransferableByUser,
 			isSetSponsorWhitelistForAllUser
 		);
 
