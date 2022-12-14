@@ -46,7 +46,7 @@ async function deploy1155custom(
         }
     });
     const nft = await NFT.deploy();
-    await nft.initialize("NFT RAINBOW URI", "NFT RAINBOW", "NFT", 200, owner.address, [owner.address, admin.address], true, true, true, true)
+    await nft.initialize("NFT RAINBOW", "NFT RAINBOW", "NFT", 200, owner.address, [owner.address, admin.address], true, true, true, true)
     return nft as ERC1155NFTCustom
 };
 
@@ -67,17 +67,17 @@ async function deploy721custom(
         }
     });
     const nft = await NFT.deploy();
-    await nft.initialize("NFT RAINBOW URI", "NFT RAINBOW", "NFT", 200, owner.address, [owner.address, admin.address], true, true, true, 0, true)
+    await nft.initialize("NFT RAINBOW", "NFT RAINBOW", "NFT", 200, owner.address, [owner.address, admin.address], true, true, true, 0, true)
     return nft as ERC721NFTCustom
 };
 
 
 
-xdescribe("test factory", async function () {
+describe("test factory", async function () {
     it("test new erc1155custom", async function () {
         const [admin, receiver, owner] = await ethers.getSigners();
         const factory = await deployAndSetTemplates();
-        const tx = await factory.newERC1155Custom("NFT RAINBOW URI", "NFT RAINBOW", "NFT", 200, owner.address, [owner.address, admin.address], true, true, true, true);
+        const tx = await factory.newERC1155Custom("NFT RAINBOW", "NFT RAINBOW", "NFT", 200, owner.address, [owner.address, admin.address], true, true, true, true);
         const receipt = await tx.wait()
         expect(receipt.status).equals(1)
 
@@ -95,7 +95,7 @@ xdescribe("test factory", async function () {
     it("test new erc721custom", async function () {
         const [admin, receiver, owner] = await ethers.getSigners();
         const factory = await deployAndSetTemplates();
-        const tx = await factory.newERC721Custom("NFT RAINBOW URI", "NFT RAINBOW", "NFT", 200, owner.address, [owner.address, admin.address], true, true, true, 1, true);
+        const tx = await factory.newERC721Custom("NFT RAINBOW", "NFT RAINBOW", "NFT", 200, owner.address, [owner.address, admin.address], true, true, true, 1, true);
         const receipt = await tx.wait()
         expect(receipt.status).equals(1)
 
