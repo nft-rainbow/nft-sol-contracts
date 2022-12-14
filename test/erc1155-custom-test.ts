@@ -34,7 +34,7 @@ async function deploy(
     return nft as ERC1155NFTCustom
 };
 
-describe("test erc1155custom", async function () {
+xdescribe("test erc1155custom", async function () {
     // eslint-disable-next-line no-unused-vars
     let admin: SignerWithAddress, receiver: SignerWithAddress, owner: SignerWithAddress, stranger0: SignerWithAddress
     // eslint-disable-next-line no-unused-vars
