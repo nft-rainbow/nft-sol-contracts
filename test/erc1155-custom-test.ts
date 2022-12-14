@@ -13,8 +13,9 @@ const roles = {
 async function deploy(
     metadataUpdatable = true,
     tokensBurnable = true,
-    tokensTransferable = true,
-    baseURI = "http://www.google.com",
+    tokensTransferableByAdmin = true,
+    tokensTransferableByUser = true,
+    baseURI = "http://BASE_URI_1155_CUSTOM/{id}.json",
 ): Promise<ERC1155NFTCustom> {
     // eslint-disable-next-line no-unused-vars
     const [admin, receiver, owner, stranger0, stranger1, stranger2, stranger3, stranger4] = await ethers.getSigners();
@@ -28,7 +29,8 @@ async function deploy(
         }
     });
     const nft = await NFT.deploy();
-    await nft.initialize("NFT RAINBOW URI", "NFT RAINBOW", "http://BASE_URI_1155_CUSTOM/{id}.json", 200, owner.address, [owner.address, admin.address], true, true, true)
+    await nft.initialize("NFT RAINBOW URI", "NFT RAINBOW", baseURI, 200, owner.address, [owner.address, admin.address],
+        tokensBurnable, tokensTransferableByAdmin, tokensTransferableByUser, true)
     return nft as ERC1155NFTCustom
 };
 
@@ -62,6 +64,36 @@ describe("test erc1155custom", async function () {
         await nft["mintTo(address,uint256,uint256,string)"](stranger1.address, 1, 10, "url_1")
         await nft.connect(owner)["mintTo(address,uint256,uint256,string)"](stranger1.address, 2, 10, "url_2")
         await expect(nft.connect(stranger1)["mintTo(address,uint256,uint256,string)"](stranger1.address, 3, 10, "url_1")).to.be.reverted;
+    })
+
+    it("test tokensTransferableByAdmin and tokensTransferableByUser", async function () {
+        // tokensTransferableByAdmin false, tokensTransferableByUser true
+        let nft = await deploy(true, true, true, true)
+        await nft["mintTo(address,uint256,uint256,string)"](stranger1.address, 1, 10, "url_1")
+        await nft.transferByAdmin(stranger1.address, stranger2.address, 1, 1);
+        await nft.transferBatchByAdmin([stranger1.address], [stranger2.address], [1], [1]);
+        await nft.connect(stranger1).safeTransferFrom(stranger1.address, stranger2.address, 1, 1, [])
+
+        // tokensTransferableByAdmin false, tokensTransferableByUser true
+        nft = await deploy(true, true, false, true)
+        await nft["mintTo(address,uint256,uint256,string)"](stranger1.address, 1, 10, "url_1")
+        await expect(nft.transferByAdmin(stranger1.address, stranger2.address, 1, 1)).to.be.reverted;
+        await expect(nft.transferBatchByAdmin([stranger1.address], [stranger2.address], [1], [1])).to.be.reverted;
+        await nft.connect(stranger1).safeTransferFrom(stranger1.address, stranger2.address, 1, 1, [])
+        // return
+        // tokensTransferableByAdmin true, tokensTransferableByUser false
+        nft = await deploy(true, true, true, false)
+        await nft["mintTo(address,uint256,uint256,string)"](stranger1.address, 1, 10, "url_1")
+        await nft.transferByAdmin(stranger1.address, stranger1.address, 1, 1);
+        await nft.transferBatchByAdmin([stranger1.address], [stranger1.address], [1], [1], );
+        await expect(nft.safeTransferFrom(stranger1.address, stranger2.address, 1, 1, [])).to.be.reverted;
+
+        // tokensTransferableByAdmin false, tokensTransferableByUser false
+        nft = await deploy(true, true, false, false)
+        await nft["mintTo(address,uint256,uint256,string)"](stranger1.address, 1, 10, "url_1")
+        await expect(nft.transferByAdmin(stranger1.address, stranger1.address, 1, 1)).to.be.reverted;
+        await expect(nft.transferBatchByAdmin([stranger1.address], [stranger1.address], [1], [1])).to.be.reverted;
+        await expect(nft.safeTransferFrom(stranger1.address, stranger2.address, 1, 1, [])).to.be.reverted;
     })
 
     it("totoal supply should be correct", async function () {

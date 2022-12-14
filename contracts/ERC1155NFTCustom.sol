@@ -6,6 +6,7 @@ import { IERC2981 } from "@openzeppelin/contracts/interfaces/IERC2981.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@confluxfans/contracts/token/CRC1155/extensions/CRC1155Enumerable.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import "hardhat/console.sol";
 
 import "./lib/ERC1155URIStorage.sol";
 import "./lib/ConfigManager.sol";
@@ -32,7 +33,8 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 		address royaltiesAddress,
 		address[] memory owners,
 		bool tokensBurnable,
-		bool tokensTransferable,
+		bool tokensTransferableByAdmin,
+		bool tokensTransferableByUser,
 		bool isSetSponsorWhitelistForAllUser
 	) public initializer {
 		super.initalize();
@@ -41,7 +43,7 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 		symbol = _symbol;
 		_setURI(baseURI);
 		_setTokensBurnable(tokensBurnable);
-		_setTokensTransferable(tokensTransferable);
+		_setTokensTransferable(tokensTransferableByAdmin, tokensTransferableByUser);
 		_setRoyalties(royaltiesBps, royaltiesAddress);
 		_addSponsorPrivilege(owners);
 
@@ -77,31 +79,18 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 		setURI(tokenId, newUri);
 	}
 
-	function burn(
-		address user,
-		uint256 id,
-		uint256 value
-	) public onlyAdmin {
+	function burn(address user, uint256 id, uint256 value) public onlyAdmin {
 		require(tokensBurnable, "NFT: tokens burning is disabled");
 		_burn(user, id, value);
 	}
 
-	function burnBatch(
-		address user,
-		uint256[] memory ids,
-		uint256[] memory values
-	) public onlyAdmin {
+	function burnBatch(address user, uint256[] memory ids, uint256[] memory values) public onlyAdmin {
 		require(tokensBurnable, "NFT: tokens burning is disabled");
 		_burnBatch(user, ids, values);
 	}
 
-	function transferByAdmin(
-		address user,
-		address to,
-		uint256 id,
-		uint256 amount
-	) public onlyAdmin {
-		require(tokensTransferable, "NFT: Transfers by admin are disabled");
+	function transferByAdmin(address user, address to, uint256 id, uint256 amount) public onlyAdmin {
+		require(tokensTransferableByAdmin, "NFT: Transfers by admin are disabled");
 		_safeTransferFrom(user, to, id, amount, "");
 	}
 
@@ -111,18 +100,13 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 		uint256[] memory ids,
 		uint256[] memory amounts
 	) public onlyAdmin {
-		require(tokensTransferable, "NFT: Transfers by admin are disabled");
+		require(tokensTransferableByAdmin, "NFT: Transfers by admin are disabled");
 		for (uint256 i = 0; i < ids.length; i++) {
 			_safeTransferFrom(users[i], to[i], ids[i], amounts[i], "");
 		}
 	}
 
-	function _mintTo(
-		address to,
-		uint256 id,
-		uint256 amount,
-		string memory tokenUri
-	) internal {
+	function _mintTo(address to, uint256 id, uint256 amount, string memory tokenUri) internal {
 		revertIfUriConflict(id, tokenUri);
 		_mint(to, id, amount, "");
 		if (bytes(tokenUri).length > 0) {
@@ -130,20 +114,11 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 		}
 	}
 
-	function mintTo(
-		address to,
-		uint256 id,
-		string memory tokenUri
-	) public onlyMinter {
+	function mintTo(address to, uint256 id, string memory tokenUri) public onlyMinter {
 		_mintTo(to, id, 1, tokenUri);
 	}
 
-	function mintTo(
-		address to,
-		uint256 id,
-		uint256 amount,
-		string memory tokenUri
-	) public onlyMinter {
+	function mintTo(address to, uint256 id, uint256 amount, string memory tokenUri) public onlyMinter {
 		_mintTo(to, id, amount, tokenUri);
 	}
 
@@ -181,13 +156,9 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 	}
 
 	/*============================= overrides==============================*/
-	function supportsInterface(bytes4 interfaceId)
-		public
-		view
-		virtual
-		override(CRC1155Enumerable, ERC1155, AccessControl)
-		returns (bool)
-	{
+	function supportsInterface(
+		bytes4 interfaceId
+	) public view virtual override(CRC1155Enumerable, ERC1155, AccessControl) returns (bool) {
 		return
 			ERC1155.supportsInterface(interfaceId) ||
 			interfaceId == type(IERC2981).interfaceId ||
@@ -202,6 +173,15 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 		uint256[] memory amounts,
 		bytes memory data
 	) internal virtual override(CRC1155Enumerable, ERC1155) {
+		// from 0 menas mint
+		if (from != address(0)) {
+			bool isAdminAndEnable = isAdmin() && tokensTransferableByAdmin;
+			bool isUserAndEnable = (from == _msgSender() || isApprovedForAll(from, _msgSender())) &&
+				tokensTransferableByUser;
+			console.log("isAdminAndEnable %s, isUserAndEnable %s", isAdminAndEnable, isUserAndEnable);
+			require(isAdminAndEnable || isUserAndEnable, "ERC1155NFTCustom: no permission");
+		}
+
 		CRC1155Enumerable._beforeTokenTransfer(operator, from, to, ids, amounts, data);
 	}
 

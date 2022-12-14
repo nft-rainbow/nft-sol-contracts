@@ -21,6 +21,10 @@ abstract contract GranularRoles is AccessControl {
 		_;
 	}
 
+	function isAdmin() public view returns(bool){
+		return hasRole(Constants.ADMIN_ROLE, msg.sender);
+	}
+
 	function initalize() internal virtual {
 		_setupRole(DEFAULT_ADMIN_ROLE, tx.origin);
 		_setRoleAdmin(Constants.MINT_ROLE, Constants.ADMIN_ROLE);
