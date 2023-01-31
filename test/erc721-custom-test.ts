@@ -16,6 +16,7 @@ async function deploy(
     tokensTransferableByAdmin = true,
     tokensTransferableByUser = true,
     baseURI = "http://BASE_URI_721_CUSTOM/",
+    sponsorOnInit = false,
 ): Promise<ERC721NFTCustom> {
     // eslint-disable-next-line no-unused-vars
     const [admin, receiver, owner, stranger0, stranger1, stranger2, stranger3, stranger4] = await ethers.getSigners();
@@ -30,7 +31,7 @@ async function deploy(
     });
     const nft = await NFT.deploy();
     await nft.initialize("NFT RAINBOW", "NFT RAINBOW", baseURI, 200, owner.address, [owner.address, admin.address],
-        tokensBurnable, tokensTransferableByAdmin, tokensTransferableByUser, 0, true)
+        tokensBurnable, tokensTransferableByAdmin, tokensTransferableByUser, 0, true, sponsorOnInit)
     return nft as ERC721NFTCustom
 };
 
@@ -46,7 +47,7 @@ describe("test erc721custom", async function () {
         // console.log("admin role %s, mint role %s", roles.ADMIN_ROLE, roles.MINT_ROLE);
     });
 
-    it("after intial roles are correct", async function () {
+    it("after initial roles are correct", async function () {
         const nft = await deploy()
 
         expect(await nft.hasRole(roles.ADMIN_ROLE, admin.address)).equal(true);
@@ -74,7 +75,7 @@ describe("test erc721custom", async function () {
         await nft.transferBatchByAdmin([stranger2.address], [stranger1.address], [1]);
         await nft.connect(stranger1)["safeTransferFrom(address,address,uint256)"](stranger1.address, stranger2.address, 1)
         await nft.connect(stranger2).transferFrom(stranger2.address, stranger1.address, 1)
-        
+
         // tokensTransferableByAdmin false, tokensTransferableByUser true
         nft = await deploy(true, true, false, true)
         await nft.mintTo(stranger1.address, 1, "url_1")

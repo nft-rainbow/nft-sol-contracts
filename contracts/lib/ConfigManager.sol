@@ -34,9 +34,13 @@ contract ConfigManager is GranularRoles {
 	// Address for royalties
 	address public royaltiesAddress;
 
+	// sponsor gas when deploy erc721/erc1155 contracts if enabled auto sponsor
+	uint public sponsorGas = 1 ether;
+	uint public sponsorCollateral = 50 ether;
+
 	event PermanentURIGlobal();
 	event BurnableChanged(bool burnable);
-	event TransferableChanged(bool transferableByAdmin,bool transferableByUser);
+	event TransferableChanged(bool transferableByAdmin, bool transferableByUser);
 	event RoyaltyUpdated(uint256 royaltiesBps, address royaltiesAddress);
 
 	function initalize() internal virtual override {
@@ -67,11 +71,14 @@ contract ConfigManager is GranularRoles {
 		_setTokensBurnable(burnable);
 	}
 
-	function setTokensTransferable(bool transferableByAdmin, bool transferableByUser) public onlyRole(Constants.ADMIN_ROLE) {
-		if (transferableByAdmin){
-			require(tokensTransferableByAdmin,"transfer by admin can be only changed to false");
+	function setTokensTransferable(
+		bool transferableByAdmin,
+		bool transferableByUser
+	) public onlyRole(Constants.ADMIN_ROLE) {
+		if (transferableByAdmin) {
+			require(tokensTransferableByAdmin, "transfer by admin can be only changed to false");
 		}
-		_setTokensTransferable(transferableByAdmin,transferableByUser);
+		_setTokensTransferable(transferableByAdmin, transferableByUser);
 	}
 
 	function setRoyalties(uint256 _royaltiesBps, address _royaltiesAddress) public onlyRole(Constants.ADMIN_ROLE) {

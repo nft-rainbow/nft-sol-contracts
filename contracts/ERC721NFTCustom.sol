@@ -41,7 +41,8 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 		bool tokensTransferableByAdmin,
 		bool tokensTransferableByUser,
 		uint256 transferCooldownTime_,
-		bool isSetSponsorWhitelistForAllUser
+		bool isSetSponsorWhitelistForAllUser,
+		bool sponsorOnInit
 	) public initializer {
 		super.initalize();
 		_initRoles(owners);
@@ -56,6 +57,10 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 
 		if (isSetSponsorWhitelistForAllUser) {
 			_setWhiteListForAllUser();
+		}
+
+		if (sponsorOnInit) {
+			_sponsor(address(this), sponsorGas, sponsorCollateral);
 		}
 	}
 

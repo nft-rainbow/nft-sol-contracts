@@ -46,8 +46,7 @@ contract ConfluxHelper is ERC1820Context, AccessControl {
 		if (!_isCfxChain()) {
 			return;
 		}
-		for (uint256 i = 0; i < whites.length; i++) {
-		}
+		for (uint256 i = 0; i < whites.length; i++) {}
 		InternalContracts.SPONSOR_CONTROL.removePrivilege(whites);
 		for (uint256 i = 0; i < whites.length; i++) {
 			require(!hasRole(Constants.ADMIN_ROLE, whites[i]), "NFT: could not remove admin");
@@ -57,5 +56,13 @@ contract ConfluxHelper is ERC1820Context, AccessControl {
 
 	function listSponsorPrivilege() public view returns (address[] memory) {
 		return sponsorWhitelist.values();
+	}
+
+	function _sponsor(address addr, uint gas, uint collateral) internal {
+		if (!_isCfxChain()) {
+			return;
+		}
+		InternalContracts.SPONSOR_CONTROL.setSponsorForGas(addr, gas);
+		InternalContracts.SPONSOR_CONTROL.setSponsorForGas(addr, collateral);
 	}
 }

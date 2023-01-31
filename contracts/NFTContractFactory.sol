@@ -29,7 +29,8 @@ interface IERC721NFTCustomIniter is IGranularRoles {
 		bool tokensTransferableByAdmin,
 		bool tokensTransferableByUser,
 		uint256 transferCooldownTime_,
-		bool isSetSponsorWhitelistForAllUser
+		bool isSetSponsorWhitelistForAllUser,
+		bool sponsorOnInit
 	) external;
 }
 
@@ -44,7 +45,8 @@ interface IERC1155NFTCustomIniter is IGranularRoles {
 		bool tokensBurnable,
 		bool tokensTransferableByAdmin,
 		bool tokensTransferableByUser,
-		bool isSetSponsorWhitelistForAllUser
+		bool isSetSponsorWhitelistForAllUser,
+		bool sponsorOnInit
 	) external;
 }
 
@@ -89,7 +91,8 @@ contract NFTContractFactory is AccessControl, Initializable, ConfluxHelper {
 		bool tokensTransferableByAdmin,
 		bool tokensTransferableByUser,
 		uint256 transferCooldownTime,
-		bool isSetSponsorWhitelistForAllUser
+		bool isSetSponsorWhitelistForAllUser,
+		bool sponsorOnInit
 	) public onlyRole(ROLE_OWNER) {
 		IERC721NFTCustomIniter instance = IERC721NFTCustomIniter(Clones.clone(erc721CustomImpl));
 		instance.initialize(
@@ -103,7 +106,8 @@ contract NFTContractFactory is AccessControl, Initializable, ConfluxHelper {
 			tokensTransferableByAdmin,
 			tokensTransferableByUser,
 			transferCooldownTime,
-			isSetSponsorWhitelistForAllUser
+			isSetSponsorWhitelistForAllUser,
+			sponsorOnInit
 		);
 
 		emit ContractCreated(ContractType.ERC721Custom, address(instance));
@@ -119,7 +123,8 @@ contract NFTContractFactory is AccessControl, Initializable, ConfluxHelper {
 		bool tokensBurnable,
 		bool tokensTransferableByAdmin,
 		bool tokensTransferableByUser,
-		bool isSetSponsorWhitelistForAllUser
+		bool isSetSponsorWhitelistForAllUser,
+		bool sponsorOnInit
 	) public onlyRole(ROLE_OWNER) {
 		IERC1155NFTCustomIniter instance = IERC1155NFTCustomIniter(Clones.clone(erc1155CustomImpl));
 		instance.initialize(
@@ -132,7 +137,8 @@ contract NFTContractFactory is AccessControl, Initializable, ConfluxHelper {
 			tokensBurnable,
 			tokensTransferableByAdmin,
 			tokensTransferableByUser,
-			isSetSponsorWhitelistForAllUser
+			isSetSponsorWhitelistForAllUser,
+			sponsorOnInit
 		);
 
 		emit ContractCreated(ContractType.ERC1155Custom, address(instance));
