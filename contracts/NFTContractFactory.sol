@@ -29,8 +29,7 @@ interface IERC721NFTCustomIniter is IGranularRoles {
 		bool tokensTransferableByAdmin,
 		bool tokensTransferableByUser,
 		uint256 transferCooldownTime_,
-		bool isSetSponsorWhitelistForAllUser,
-		bool sponsorOnInit
+		bool isSetSponsorWhitelistForAllUser
 	) external;
 }
 
@@ -45,8 +44,7 @@ interface IERC1155NFTCustomIniter is IGranularRoles {
 		bool tokensBurnable,
 		bool tokensTransferableByAdmin,
 		bool tokensTransferableByUser,
-		bool isSetSponsorWhitelistForAllUser,
-		bool sponsorOnInit
+		bool isSetSponsorWhitelistForAllUser
 	) external;
 }
 
@@ -55,6 +53,10 @@ contract NFTContractFactory is AccessControl, Initializable, ConfluxHelper {
 
 	address public erc721CustomImpl;
 	address public erc1155CustomImpl;
+
+	// sponsor when deploy erc721/erc1155 contracts
+	uint public sponsorGas = 0.01 ether;
+	uint public sponsorCollateral = 0.99 ether;
 
 	event ContractCreated(ContractType contractType, address contractAddress);
 
@@ -91,8 +93,7 @@ contract NFTContractFactory is AccessControl, Initializable, ConfluxHelper {
 		bool tokensTransferableByAdmin,
 		bool tokensTransferableByUser,
 		uint256 transferCooldownTime,
-		bool isSetSponsorWhitelistForAllUser,
-		bool sponsorOnInit
+		bool isSetSponsorWhitelistForAllUser
 	) public onlyRole(ROLE_OWNER) {
 		IERC721NFTCustomIniter instance = IERC721NFTCustomIniter(Clones.clone(erc721CustomImpl));
 		instance.initialize(
@@ -106,10 +107,10 @@ contract NFTContractFactory is AccessControl, Initializable, ConfluxHelper {
 			tokensTransferableByAdmin,
 			tokensTransferableByUser,
 			transferCooldownTime,
-			isSetSponsorWhitelistForAllUser,
-			sponsorOnInit
+			isSetSponsorWhitelistForAllUser
 		);
 
+		_sponsor(address(this), sponsorGas, sponsorCollateral);
 		emit ContractCreated(ContractType.ERC721Custom, address(instance));
 	}
 
@@ -123,8 +124,7 @@ contract NFTContractFactory is AccessControl, Initializable, ConfluxHelper {
 		bool tokensBurnable,
 		bool tokensTransferableByAdmin,
 		bool tokensTransferableByUser,
-		bool isSetSponsorWhitelistForAllUser,
-		bool sponsorOnInit
+		bool isSetSponsorWhitelistForAllUser
 	) public onlyRole(ROLE_OWNER) {
 		IERC1155NFTCustomIniter instance = IERC1155NFTCustomIniter(Clones.clone(erc1155CustomImpl));
 		instance.initialize(
@@ -137,10 +137,10 @@ contract NFTContractFactory is AccessControl, Initializable, ConfluxHelper {
 			tokensBurnable,
 			tokensTransferableByAdmin,
 			tokensTransferableByUser,
-			isSetSponsorWhitelistForAllUser,
-			sponsorOnInit
+			isSetSponsorWhitelistForAllUser
 		);
 
+		_sponsor(address(this), sponsorGas, sponsorCollateral);
 		emit ContractCreated(ContractType.ERC1155Custom, address(instance));
 	}
 }

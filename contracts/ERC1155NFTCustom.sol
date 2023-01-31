@@ -35,8 +35,7 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 		bool tokensBurnable,
 		bool tokensTransferableByAdmin,
 		bool tokensTransferableByUser,
-		bool isSetSponsorWhitelistForAllUser,
-		bool sponsorOnInit
+		bool isSetSponsorWhitelistForAllUser
 	) public initializer {
 		super.initalize();
 		_initRoles(owners);
@@ -50,11 +49,7 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 
 		if (isSetSponsorWhitelistForAllUser) {
 			_setWhiteListForAllUser();
-		}
-
-		if (sponsorOnInit) {
-			_sponsor(address(this), sponsorGas, sponsorCollateral);
-		}
+		}	
 	}
 
 	function setURI(string memory newURI) public onlyAdmin {

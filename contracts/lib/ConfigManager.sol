@@ -34,10 +34,6 @@ contract ConfigManager is GranularRoles {
 	// Address for royalties
 	address public royaltiesAddress;
 
-	// sponsor gas when deploy erc721/erc1155 contracts if enabled auto sponsor
-	uint public sponsorGas = 1 ether;
-	uint public sponsorCollateral = 50 ether;
-
 	event PermanentURIGlobal();
 	event BurnableChanged(bool burnable);
 	event TransferableChanged(bool transferableByAdmin, bool transferableByUser);
