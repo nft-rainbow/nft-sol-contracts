@@ -56,6 +56,7 @@ contract NFTContractFactory is AccessControl, Initializable, ConfluxHelper {
 
 	// sponsor when deploy erc721/erc1155 contracts
 	uint public sponsorGas = 0.01 ether;
+	uint public sponsorGasUpperBound = 0.001 ether;
 	uint public sponsorCollateral = 0.99 ether;
 
 	event ContractCreated(ContractType contractType, address contractAddress);
@@ -110,7 +111,7 @@ contract NFTContractFactory is AccessControl, Initializable, ConfluxHelper {
 			isSetSponsorWhitelistForAllUser
 		);
 
-		_sponsor(address(this), sponsorGas, sponsorCollateral);
+		_sponsor(address(instance), sponsorGas, sponsorGasUpperBound, sponsorCollateral);
 		emit ContractCreated(ContractType.ERC721Custom, address(instance));
 	}
 
@@ -140,7 +141,14 @@ contract NFTContractFactory is AccessControl, Initializable, ConfluxHelper {
 			isSetSponsorWhitelistForAllUser
 		);
 
-		_sponsor(address(this), sponsorGas, sponsorCollateral);
+		_sponsor(address(instance), sponsorGas, sponsorGasUpperBound, sponsorCollateral);
 		emit ContractCreated(ContractType.ERC1155Custom, address(instance));
 	}
+
+	function withdraw(uint amount) public onlyRole(ROLE_OWNER) {
+		require(msg.sender.balance >= amount, "out of balance");
+		payable(msg.sender).transfer(amount);
+	}
+
+	receive() external payable {}
 }

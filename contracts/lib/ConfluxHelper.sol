@@ -58,11 +58,25 @@ contract ConfluxHelper is ERC1820Context, AccessControl {
 		return sponsorWhitelist.values();
 	}
 
-	function _sponsor(address addr, uint gas, uint collateral) internal {
+	function _sponsor(address addr, uint gas, uint gasUpperbound, uint collateral) internal {
 		if (!_isCfxChain()) {
 			return;
 		}
-		InternalContracts.SPONSOR_CONTROL.setSponsorForGas(addr, gas);
-		InternalContracts.SPONSOR_CONTROL.setSponsorForGas(addr, collateral);
+		require(address(this).balance > 0, "need deposit");
+
+		address spnsorForGas = InternalContracts.SPONSOR_CONTROL.getSponsorForGas(addr);
+		address spnsorForColl = InternalContracts.SPONSOR_CONTROL.getSponsorForCollateral(addr);
+
+		require(spnsorForGas == address(0), "has sponsored gas user");
+		require(spnsorForColl == address(0), "has sponsored coll user");
+
+		uint sponsorGasBalance = InternalContracts.SPONSOR_CONTROL.getSponsoredBalanceForGas(addr);
+		uint sponsorCollBalance = InternalContracts.SPONSOR_CONTROL.getSponsoredBalanceForCollateral(addr);
+
+		require(sponsorGasBalance == 0, "has sponsored gas balance");
+		require(sponsorCollBalance == 0, "has sponsored coll balance");
+
+		InternalContracts.SPONSOR_CONTROL.setSponsorForGas{ value: gas }(addr, gasUpperbound);
+		InternalContracts.SPONSOR_CONTROL.setSponsorForCollateral{ value: collateral }(addr);
 	}
 }

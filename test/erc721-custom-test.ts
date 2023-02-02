@@ -15,8 +15,7 @@ async function deploy(
     tokensBurnable = true,
     tokensTransferableByAdmin = true,
     tokensTransferableByUser = true,
-    baseURI = "http://BASE_URI_721_CUSTOM/",
-    sponsorOnInit = false,
+    baseURI = "http://BASE_URI_721_CUSTOM/"
 ): Promise<ERC721NFTCustom> {
     // eslint-disable-next-line no-unused-vars
     const [admin, receiver, owner, stranger0, stranger1, stranger2, stranger3, stranger4] = await ethers.getSigners();
@@ -31,7 +30,7 @@ async function deploy(
     });
     const nft = await NFT.deploy();
     await nft.initialize("NFT RAINBOW", "NFT RAINBOW", baseURI, 200, owner.address, [owner.address, admin.address],
-        tokensBurnable, tokensTransferableByAdmin, tokensTransferableByUser, 0, true, sponsorOnInit)
+        tokensBurnable, tokensTransferableByAdmin, tokensTransferableByUser, 0, true)
     return nft as ERC721NFTCustom
 };
 
