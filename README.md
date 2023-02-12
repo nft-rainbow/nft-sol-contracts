@@ -6,5 +6,5 @@ This project contains the NFT solidity contract templates
 
 ### ContractSponsorInfo
 
-* Mainnet: `cfx:acdw2dtjbda4f805tp4mkkzrvmk8yyx2eysen3w8c0`
-* Testnet: `cfxtest:acgvuvrvk84hjzhsh0v0zuy6bk1zenrwv69ay2n75n`
+* Mainnet: `cfx:acch0rtajf7gu2z5pr8f1k3d6vnr9mpv1pfeau9jk6`
+* Testnet: `cfxtest:acfbnrv048jvnnx28ewewufr0pf93b5aey6ug6fsyz`

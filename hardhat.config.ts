@@ -8,6 +8,7 @@ import "hardhat-gas-reporter";
 import "solidity-coverage";
 import "hardhat-conflux";
 import { checkRole, tryMintTo } from "./tools/validate";
+import 'hardhat-abi-exporter'
 
 dotenv.config();
 
@@ -92,6 +93,17 @@ const config: HardhatUserConfig = {
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
   },
+  abiExporter: {
+    path: './build/contracts',
+    runOnCompile: true,
+    clear: true,
+    flat: true,
+    except: [
+        ''
+    ],
+    spacing: 2,
+    pretty: true,
+  }
 };
 
 export default config;
