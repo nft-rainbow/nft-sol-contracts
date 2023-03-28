@@ -3,11 +3,6 @@ import { network, conflux } from "hardhat";
 import { nftFactoryProxyAddress } from "../../app.config.json";
 // import { conflux } from "hardhat";
 
-// const nftFactoryProxyAddress: { [networkName: string]: string | undefined } = {
-//   "cfxtest": "cfxtest:ach4wmgug7f5yuhwksxyxp50eeu7y3981eh6nt5fj3",
-//   "cfx": "cfx:acf2rcsh8payyxpg6xj7b0ztswwh81ute60tsw35j7"
-// }
-
 async function deployOrUpdateNftFactoryTemplate() {
   // @ts-ignore
   const accounts = await conflux.getSigners();
@@ -22,6 +17,7 @@ async function deployOrUpdateNftFactoryTemplate() {
     proxy = await deploy("Proxy1967", factoryTemplate.contractCreated);
     // @ts-ignore
     proxy = await conflux.getContractAt("Proxy1967", proxy.contractCreated);
+    (nftFactoryProxyAddress as any)[network.name] = proxy.address
     console.log("Proxy deployed at %s, use NFTContractFactory template address %s", proxy.address, factoryTemplate.contractCreated);
   } else {
     // @ts-ignore
@@ -77,11 +73,8 @@ async function updateTemplates(is721Custom: boolean, is1155Custom: boolean) {
   const erc721TemplateAddr = is721Custom ? (await deployErc721customTemplate()).contractCreated : await factory.erc721CustomImpl();
   const erc1155TemplateAddr = is1155Custom ? (await deployErc1155customTemplate()).contractCreated : await factory.erc1155CustomImpl();
 
-  await factory.updateNftTemplates(erc721TemplateAddr, erc1155TemplateAddr)
-    .sendTransaction({
-      from: accounts[0].address,
-    })
-    .executed();
+  await factory.updateNftTemplates(erc721TemplateAddr, erc1155TemplateAddr).sendTransaction({from: accounts[0].address,}).executed();
+
   console.log("Updated nft templates to:", erc721TemplateAddr, erc1155TemplateAddr);
 }
 

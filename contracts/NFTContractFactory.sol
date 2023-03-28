@@ -111,7 +111,7 @@ contract NFTContractFactory is AccessControl, Initializable, ConfluxHelper {
 			isSetSponsorWhitelistForAllUser
 		);
 
-		_sponsor(address(instance), sponsorGas, sponsorGasUpperBound, sponsorCollateral);
+		// _sponsor(address(instance), sponsorGas, sponsorGasUpperBound, sponsorCollateral);
 		emit ContractCreated(ContractType.ERC721Custom, address(instance));
 	}
 
@@ -141,7 +141,7 @@ contract NFTContractFactory is AccessControl, Initializable, ConfluxHelper {
 			isSetSponsorWhitelistForAllUser
 		);
 
-		_sponsor(address(instance), sponsorGas, sponsorGasUpperBound, sponsorCollateral);
+		// _sponsor(address(instance), sponsorGas, sponsorGasUpperBound, sponsorCollateral);
 		emit ContractCreated(ContractType.ERC1155Custom, address(instance));
 	}
 

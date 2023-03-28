@@ -64,6 +64,8 @@ contract ConfluxHelper is ERC1820Context, AccessControl {
 		}
 		require(address(this).balance > 0, "need deposit");
 
+		require(gas>=gasUpperbound*1000,"gas < upper bound * 1000");
+
 		address spnsorForGas = InternalContracts.SPONSOR_CONTROL.getSponsorForGas(addr);
 		address spnsorForColl = InternalContracts.SPONSOR_CONTROL.getSponsorForCollateral(addr);
 
