@@ -2,18 +2,22 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 import "@confluxfans/contracts/InternalContracts/SponsorWhitelistControl.sol";
+import "@confluxfans/contracts/InternalContracts/AdminControl.sol";
 
 contract ContractSponsorInfo {
-	struct SponsorInfo {
+	AdminControl constant ac = AdminControl(0x0888000000000000000000000000000000000000);
+    SponsorWhitelistControl constant spc = SponsorWhitelistControl(0x0888000000000000000000000000000000000001);
+    
+    struct SponsorInfo {
 		uint256 gasBalance;
 		address gasSponsor;
 		uint256 gasFeeUpperBound;
 		address collateralSponsor;
 		uint256 collateralBalance;
 		bool isAllWhiteListed;
+        address contractAdmin;
+        bool isContract;
 	}
-
-	SponsorWhitelistControl cpc = SponsorWhitelistControl(0x0888000000000000000000000000000000000001);
 
 	function getSponsorInfos(address[] memory addresses) public view returns (SponsorInfo[] memory) {
 		SponsorInfo[] memory SponsorInfos = new SponsorInfo[](uint(addresses.length));
@@ -26,23 +30,29 @@ contract ContractSponsorInfo {
 	}
 
 	function getSponsorInfo(address target) public view returns (SponsorInfo memory) {
-		require(isContract(target), "The address should be contract address");
+        if (!isContract(target)) {
+            SponsorInfo memory empty;
+		    return empty;
+        }
 
-		address gasSponsor = cpc.getSponsorForGas(target);
-		uint256 gasBalnce = cpc.getSponsoredBalanceForGas(target);
-		uint256 gasFeeUpperBound = cpc.getSponsoredGasFeeUpperBound(target);
-		address collateralSponsor = cpc.getSponsorForCollateral(target);
-		uint256 collateralBalance = cpc.getSponsoredBalanceForCollateral(target);
-		bool isAllWhiteListed = cpc.isAllWhitelisted(target);
-		SponsorInfo memory res = SponsorInfo(
+		address gasSponsor = spc.getSponsorForGas(target);
+		uint256 gasBalnce = spc.getSponsoredBalanceForGas(target);
+		uint256 gasFeeUpperBound = spc.getSponsoredGasFeeUpperBound(target);
+		address collateralSponsor = spc.getSponsorForCollateral(target);
+		uint256 collateralBalance = spc.getSponsoredBalanceForCollateral(target);
+		bool isAllWhiteListed = spc.isAllWhitelisted(target);
+        address admin = ac.getAdmin(target);
+
+		return SponsorInfo(
 			gasBalnce,
 			gasSponsor,
 			gasFeeUpperBound,
 			collateralSponsor,
 			collateralBalance,
-			isAllWhiteListed
+			isAllWhiteListed,
+            admin,
+            true
 		);
-		return res;
 	}
 
 	function isContract(address addr) private view returns (bool) {
