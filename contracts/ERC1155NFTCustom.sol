@@ -32,7 +32,7 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 		uint256 royaltiesBps,
 		address royaltiesAddress,
 		address[] memory owners,
-		bool tokensBurnable,
+		// bool tokensBurnable,
 		bool tokensTransferableByAdmin,
 		bool tokensTransferableByUser,
 		bool isSetSponsorWhitelistForAllUser
@@ -42,7 +42,7 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 		name = _name;
 		symbol = _symbol;
 		_setURI(baseURI);
-		_setTokensBurnable(tokensBurnable);
+		// _setTokensBurnable(tokensBurnable);
 		_setTokensTransferable(tokensTransferableByAdmin, tokensTransferableByUser);
 		_setRoyalties(royaltiesBps, royaltiesAddress);
 		_addSponsorPrivilege(owners);
@@ -80,12 +80,12 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 	}
 
 	function burn(address user, uint256 id, uint256 value) public onlyAdmin {
-		require(tokensBurnable, "NFT: tokens burning is disabled");
+		require(tokensBurnable(), "NFT: tokens burning is disabled");
 		_burn(user, id, value);
 	}
 
 	function burnBatch(address user, uint256[] memory ids, uint256[] memory values) public onlyAdmin {
-		require(tokensBurnable, "NFT: tokens burning is disabled");
+		require(tokensBurnable(), "NFT: tokens burning is disabled");
 		_burnBatch(user, ids, values);
 	}
 

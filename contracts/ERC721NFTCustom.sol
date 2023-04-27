@@ -37,7 +37,7 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 		uint256 royaltiesBps,
 		address royaltiesAddress,
 		address[] memory owners,
-		bool tokensBurnable,
+		// bool tokensBurnable,
 		bool tokensTransferableByAdmin,
 		bool tokensTransferableByUser,
 		uint256 transferCooldownTime_,
@@ -49,7 +49,7 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 		_symbol = symbol_;
 		baseURI = uri;
 		_setTransferCooldownTime(transferCooldownTime_);
-		_setTokensBurnable(tokensBurnable);
+		// _setTokensBurnable(tokensBurnable);
 		_setTokensTransferable(tokensTransferableByAdmin, tokensTransferableByUser);
 		_setRoyalties(royaltiesBps, royaltiesAddress);
 		_addSponsorPrivilege(owners);
@@ -107,12 +107,12 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 	}
 
 	function burn(uint256 id) public onlyAdmin {
-		require(tokensBurnable, "NFT: tokens burning is disabled");
+		require(tokensBurnable(), "NFT: tokens burning is disabled");
 		_burn(id);
 	}
 
 	function burnBatch(uint256[] memory ids) public onlyAdmin {
-		require(tokensBurnable, "NFT: tokens burning is disabled");
+		require(tokensBurnable(), "NFT: tokens burning is disabled");
 		for (uint256 i = 0; i < ids.length; i++) {
 			_burn(ids[i]);
 		}

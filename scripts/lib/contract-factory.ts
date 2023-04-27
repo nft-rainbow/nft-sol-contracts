@@ -1,6 +1,6 @@
 import { deploy, deployWithLibs } from "./deploy";
 import { network, conflux } from "hardhat";
-import { nftFactoryProxyAddress } from "../../app.config.json";
+import { nftFactoryProxyAddress } from "../../app.dev.config.json";
 // import { conflux } from "hardhat";
 
 async function deployOrUpdateNftFactoryTemplate() {

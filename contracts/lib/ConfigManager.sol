@@ -16,7 +16,7 @@ contract ConfigManager is GranularRoles {
 	// This is also the wallet that can manage the contract on NFT marketplaces.
 	// address owner;
 	// If true, tokens may be burned by owner. Cannot be changed later.
-	bool public tokensBurnable;
+	// bool public tokensBurnable;
 	// Metadata base URI for tokens, NFTs minted in this contract will have metadata URI of `baseURI` + `tokenID`.
 	// Set this to reveal token metadata.
 	// string baseURI;
@@ -35,7 +35,7 @@ contract ConfigManager is GranularRoles {
 	address public royaltiesAddress;
 
 	event PermanentURIGlobal();
-	event BurnableChanged(bool burnable);
+	// event BurnableChanged(bool burnable);
 	event TransferableChanged(bool transferableByAdmin, bool transferableByUser);
 	event RoyaltyUpdated(uint256 royaltiesBps, address royaltiesAddress);
 
@@ -46,15 +46,19 @@ contract ConfigManager is GranularRoles {
 		tokensTransferableByUser = true;
 	}
 
-	function _setTokensBurnable(bool burnable) internal {
-		tokensBurnable = burnable;
-		emit BurnableChanged(burnable);
-	}
+	// function _setTokensBurnable(bool burnable) internal {
+	// 	tokensBurnable = burnable;
+	// 	emit BurnableChanged(burnable);
+	// }
 
 	function _setTokensTransferable(bool transferableByAdmin, bool transferableByUser) internal {
 		tokensTransferableByAdmin = transferableByAdmin;
 		tokensTransferableByUser = transferableByUser;
 		emit TransferableChanged(transferableByAdmin, transferableByUser);
+	}
+
+	function tokensBurnable() public view returns(bool){
+		return tokensTransferableByAdmin;
 	}
 
 	function _setRoyalties(uint256 _royaltiesBps, address _royaltiesAddress) internal {
@@ -63,9 +67,9 @@ contract ConfigManager is GranularRoles {
 		emit RoyaltyUpdated(royaltiesBps, royaltiesAddress);
 	}
 
-	function setTokensBurnable(bool burnable) public onlyRole(Constants.ADMIN_ROLE) {
-		_setTokensBurnable(burnable);
-	}
+	// function setTokensBurnable(bool burnable) public onlyRole(Constants.ADMIN_ROLE) {
+	// 	_setTokensBurnable(burnable);
+	// }
 
 	function setTokensTransferable(
 		bool transferableByAdmin,
