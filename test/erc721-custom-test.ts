@@ -30,7 +30,7 @@ async function deploy(
     });
     const nft = await NFT.deploy();
     await nft.initialize("NFT RAINBOW", "NFT RAINBOW", baseURI, 200, owner.address, [owner.address, admin.address],
-        tokensBurnable, tokensTransferableByAdmin, tokensTransferableByUser, 0, true)
+        tokensTransferableByAdmin, tokensTransferableByUser, 0, true)
     return nft as ERC721NFTCustom
 };
 

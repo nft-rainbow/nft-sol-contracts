@@ -8,9 +8,9 @@ export:
 # deploy NFTContractFactory proxy or update NFTContractFactory template if proxy already exists, then update both ERC721NFTCustom and ERC1155NFTCustom templates
 deploy:
 	npx hardhat compile  
-	PRIVATE_KEY=${PRIVATE_KEY} HARDHAT_NETWORK=${HARDHAT_NETWORK} ts-node ./scripts/cli/contract-factory-op.ts deploy
+	PRIVATE_KEY=${PRIVATE_KEY} HARDHAT_NETWORK=${HARDHAT_NETWORK} ENV=${ENV} ts-node ./scripts/cli/contract-factory-op.ts deploy
 
 # update ERC721NFTCustom or ERC1155NFTCustom templates
 update:
 	npx hardhat compile
-	PRIVATE_KEY=${PRIVATE_KEY} HARDHAT_NETWORK=${HARDHAT_NETWORK} ts-node ./scripts/cli/contract-factory-op.ts update_templates --erc721 true --erc1155 true
+	PRIVATE_KEY=${PRIVATE_KEY} HARDHAT_NETWORK=${HARDHAT_NETWORK} END=${ENV} ts-node ./scripts/cli/contract-factory-op.ts update_templates --erc721 true --erc1155 true

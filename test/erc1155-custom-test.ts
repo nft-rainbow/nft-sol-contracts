@@ -30,7 +30,7 @@ async function deploy(
     });
     const nft = await NFT.deploy();
     await nft.initialize("NFT RAINBOW URI", "NFT RAINBOW", baseURI, 200, owner.address, [owner.address, admin.address],
-        tokensBurnable, tokensTransferableByAdmin, tokensTransferableByUser, true)
+        tokensTransferableByAdmin, tokensTransferableByUser, true)
     return nft as ERC1155NFTCustom
 };
 
@@ -85,7 +85,7 @@ describe("test erc1155custom", async function () {
         nft = await deploy(true, true, true, false)
         await nft["mintTo(address,uint256,uint256,string)"](stranger1.address, 1, 10, "url_1")
         await nft.transferByAdmin(stranger1.address, stranger1.address, 1, 1);
-        await nft.transferBatchByAdmin([stranger1.address], [stranger1.address], [1], [1], );
+        await nft.transferBatchByAdmin([stranger1.address], [stranger1.address], [1], [1],);
         await expect(nft.safeTransferFrom(stranger1.address, stranger2.address, 1, 1, [])).to.be.reverted;
 
         // tokensTransferableByAdmin false, tokensTransferableByUser false
