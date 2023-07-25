@@ -39,7 +39,7 @@ contract ContractSponsorInfo {
 		uint256 gasBalnce = spc.getSponsoredBalanceForGas(target);
 		uint256 gasFeeUpperBound = spc.getSponsoredGasFeeUpperBound(target);
 		address collateralSponsor = spc.getSponsorForCollateral(target);
-		uint256 collateralBalance = spc.getSponsoredBalanceForCollateral(target);
+		uint256 collateralBalance = getSponsoredBalanceForCollateral(target);
 		bool isAllWhiteListed = spc.isAllWhitelisted(target);
         address admin = ac.getAdmin(target);
 
@@ -54,6 +54,12 @@ contract ContractSponsorInfo {
             true
 		);
 	}
+
+    function getSponsoredBalanceForCollateral(address target) public view returns (uint256) {
+        uint256 sponsorBalance = spc.getSponsoredBalanceForCollateral(target);
+        uint256 availablePoints = spc.getAvailableStoragePoints(target);
+        return sponsorBalance + availablePoints / 1024 * 1 ether;
+    }
 
 	function isContract(address addr) private view returns (bool) {
 		uint size;
