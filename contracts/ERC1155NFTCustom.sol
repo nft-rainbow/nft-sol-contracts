@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import { ERC1155 } from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import { IERC2981 } from "@openzeppelin/contracts/interfaces/IERC2981.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
-import "@confluxfans/contracts/token/CRC1155/extensions/CRC1155Enumerable.sol";
-import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
-import "hardhat/console.sol";
+import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
+import { ICRC1155Enumerable, CRC1155Enumerable } from "@confluxfans/contracts/token/CRC1155/extensions/CRC1155Enumerable.sol";
+import { Initializable } from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
 
-import "./lib/ERC1155URIStorage.sol";
-import "./lib/ConfigManager.sol";
-import "./lib/StringUtils.sol";
-import "./lib/ConfluxHelper.sol";
+import { ERC1155URIStorage } from "./lib/ERC1155URIStorage.sol";
+import { ConfigManager } from "./lib/ConfigManager.sol";
+import { StringUtils } from "./lib/StringUtils.sol";
+import { ConfluxHelper } from "./lib/ConfluxHelper.sol";
 
 contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager, Initializable, ConfluxHelper {
 	using Strings for uint256;
@@ -49,7 +49,7 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 
 		if (isSetSponsorWhitelistForAllUser) {
 			_setWhiteListForAllUser();
-		}	
+		}
 	}
 
 	function setURI(string memory newURI) public onlyAdmin {
@@ -178,7 +178,7 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 			bool isAdminAndEnable = isAdmin() && tokensTransferableByAdmin;
 			bool isUserAndEnable = (from == _msgSender() || isApprovedForAll(from, _msgSender())) &&
 				tokensTransferableByUser;
-			console.log("isAdminAndEnable %s, isUserAndEnable %s", isAdminAndEnable, isUserAndEnable);
+			// console.log("isAdminAndEnable %s, isUserAndEnable %s", isAdminAndEnable, isUserAndEnable);
 			require(isAdminAndEnable || isUserAndEnable, "ERC1155NFTCustom: no permission");
 		}
 

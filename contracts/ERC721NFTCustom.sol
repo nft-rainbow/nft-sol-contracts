@@ -1,16 +1,22 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import { IERC2981 } from "@openzeppelin/contracts/interfaces/IERC2981.sol";
-import "@confluxfans/contracts/token/CRC721/extensions/CRC721Enumerable.sol";
-import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
-import "hardhat/console.sol";
+import { ERC721Enumerable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import { CRC721Enumerable } from "@confluxfans/contracts/token/CRC721/extensions/CRC721Enumerable.sol";
+import { Initializable } from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
+import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
 
-import "./lib/ERC721URIStorage.sol";
-import "./lib/Base64.sol";
-import "./lib/ConfigManager.sol";
-import "./lib/StringUtils.sol";
-import "./lib/ConfluxHelper.sol";
+import {ERC721URIStorage} from "./lib/ERC721URIStorage.sol";
+// import "./lib/Base64.sol";
+import { ConfigManager } from "./lib/ConfigManager.sol";
+import { StringUtils } from "./lib/StringUtils.sol";
+import { ConfluxHelper } from "./lib/ConfluxHelper.sol";
+
+// import {console} from "hardhat/console.sol";
+
 
 contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, Initializable, ConfluxHelper {
 	using Strings for uint256;
@@ -183,7 +189,7 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 		if (from != address(0)) {
 			bool isAdminAndEnable = isAdmin() && tokensTransferableByAdmin;
 			bool isUserAndEnable = _isApprovedOrOwner(_msgSender(), tokenId) && tokensTransferableByUser;
-			console.log("isAdminAndEnable %s, isUserAndEnable %s", isAdminAndEnable, isUserAndEnable);
+			// console.log("isAdminAndEnable %s, isUserAndEnable %s", isAdminAndEnable, isUserAndEnable);
 			require(isAdminAndEnable || isUserAndEnable, "ERC721NFTCustom: no permission");
 		}
 		ERC721Enumerable._beforeTokenTransfer(from, to, tokenId);
