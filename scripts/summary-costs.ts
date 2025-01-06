@@ -3,8 +3,8 @@ import { conflux } from "hardhat";
 import { deployAndInitialize } from "./lib/deploy"
 
 type DeployResult = {
-    // erc721: string,
-    // erc1155: string,
+    erc721NoEnum: string,
+    erc1155NoEnum: string,
     erc721Enum: string,
     erc1155Enum: string,
 }
@@ -49,13 +49,17 @@ async function deployContracts(): Promise<DeployResult> {
     // console.log("Deployed MYERC1155 at %s", erc1155.contractCreated);
 
     // @ts-ignore
-    const erc721Enum = await deployAndInitialize("ERC721NFTCustom", "ERC721NFTCustom", "ERC721ENUM","",0,"0x0000000000000000000000000000000000000000",[accounts[0].address],true,true,0,true);
+    const erc721NoEnum = await deployAndInitialize("ERC721NFTCustomNoEnum", "ERC721NFTCustomNoEnum", "ERC721NoENUM", "", 0, "0x0000000000000000000000000000000000000000", [accounts[0].address], true, true, 0, true);
     // @ts-ignore
-    const erc1155Enum = await deployAndInitialize("ERC1155NFTCustom","ERC1155NFTCustom","ERC1155ENUM","",0,"0x0000000000000000000000000000000000000000",[accounts[0].address],true,true,true);
+    const erc1155NoEnum = await deployAndInitialize("ERC1155NFTCustomNoEnum", "ERC1155NFTCustomNoEnum", "ERC1155NoENUM", "", 0, "0x0000000000000000000000000000000000000000", [accounts[0].address], true, true, true);
+    // @ts-ignore
+    const erc721Enum = await deployAndInitialize("ERC721NFTCustom", "ERC721NFTCustom", "ERC721ENUM", "", 0, "0x0000000000000000000000000000000000000000", [accounts[0].address], true, true, 0, true);
+    // @ts-ignore
+    const erc1155Enum = await deployAndInitialize("ERC1155NFTCustom", "ERC1155NFTCustom", "ERC1155ENUM", "", 0, "0x0000000000000000000000000000000000000000", [accounts[0].address], true, true, true);
 
     return {
-        // erc721: erc721.contractCreated,
-        // erc1155: erc1155.contractCreated,
+        erc721NoEnum: erc721NoEnum.contractCreated,
+        erc1155NoEnum: erc1155NoEnum.contractCreated,
         erc721Enum: erc721Enum.contractCreated,
         erc1155Enum: erc1155Enum.contractCreated
     }
@@ -72,32 +76,32 @@ async function summary() {
     const actions = new Actions();
 
     // ============= erc721 ==============
-    // console.log("run erc721")
-    // // @ts-ignore
-    // let erc721 = await conflux.getContractAt("MYERC721", contractAddrs.erc721);
-    // let receipt = await erc721.mint().sendTransaction({ from: accounts[0].address, }).executed();
-    // actions.push(new Action("erc721", "mint", receipt))
+    console.log("run erc721 without enum")
+    // @ts-ignore
+    let erc721NoEnum = await conflux.getContractAt("ERC721NFTCustomNoEnum", contractAddrs.erc721NoEnum);
+    let receipt = await erc721NoEnum.mintTo(accounts[0].address, 0, "").sendTransaction({ from: accounts[0].address, }).executed();
+    actions.push(new Action("erc721NoEnum", "mint", receipt))
 
-    // receipt = await erc721.transferFrom(accounts[0].address, receivers[0], 0).sendTransaction({ from: accounts[0].address, }).executed();
-    // actions.push(new Action("erc721", "transferFrom -> poor user", receipt))
+    receipt = await erc721NoEnum.transferFrom(accounts[0].address, receivers[0], 0).sendTransaction({ from: accounts[0].address, }).executed();
+    actions.push(new Action("erc721NoEnum", "transferFrom -> poor user", receipt))
 
-    // receipt = await erc721.mint().sendTransaction({ from: accounts[0].address, }).executed();
-    // receipt = await erc721.transferFrom(accounts[0].address, receivers[0], 1).sendTransaction({ from: accounts[0].address, }).executed();
-    // actions.push(new Action("erc721", "transferFrom -> rich user", receipt))
+    receipt = await erc721NoEnum.mintTo(accounts[0].address, 1, "").sendTransaction({ from: accounts[0].address, }).executed();
+    receipt = await erc721NoEnum.transferFrom(accounts[0].address, receivers[0], 1).sendTransaction({ from: accounts[0].address, }).executed();
+    actions.push(new Action("erc721NoEnum", "transferFrom -> rich user", receipt))
 
-    // receipt = await erc721.mint().sendTransaction({ from: accounts[0].address, }).executed();
-    // receipt = await erc721.safeTransferFrom(accounts[0].address, receivers[1], 2).sendTransaction({ from: accounts[0].address, }).executed();
-    // actions.push(new Action("erc721", "safeTransferFrom -> poor user", receipt))
+    receipt = await erc721NoEnum.mintTo(accounts[0].address, 2, "").sendTransaction({ from: accounts[0].address, }).executed();
+    receipt = await erc721NoEnum.safeTransferFrom(accounts[0].address, receivers[1], 2).sendTransaction({ from: accounts[0].address, }).executed();
+    actions.push(new Action("erc721NoEnum", "safeTransferFrom -> poor user", receipt))
 
-    // receipt = await erc721.mint().sendTransaction({ from: accounts[0].address, }).executed();
-    // receipt = await erc721.safeTransferFrom(accounts[0].address, receivers[1], 3).sendTransaction({ from: accounts[0].address, }).executed();
-    // actions.push(new Action("erc721", "safeTransferFrom -> rich user", receipt))
+    receipt = await erc721NoEnum.mintTo(accounts[0].address, 3, "").sendTransaction({ from: accounts[0].address, }).executed();
+    receipt = await erc721NoEnum.safeTransferFrom(accounts[0].address, receivers[1], 3).sendTransaction({ from: accounts[0].address, }).executed();
+    actions.push(new Action("erc721NoEnum", "safeTransferFrom -> rich user", receipt))
 
     // ============= erc721 enum ==============
     console.log("run erc721 enum")
     // @ts-ignore
     let erc721Enum = await conflux.getContractAt("ERC721NFTCustom", contractAddrs.erc721Enum);
-    let receipt = await erc721Enum.mintTo(accounts[0].address, 0, "").sendTransaction({ from: accounts[0].address, }).executed();
+    receipt = await erc721Enum.mintTo(accounts[0].address, 0, "").sendTransaction({ from: accounts[0].address, }).executed();
     actions.push(new Action("erc721Enum", "mint", receipt))
 
     receipt = await erc721Enum.transferFrom(accounts[0].address, receivers[0], 0).sendTransaction({ from: accounts[0].address, }).executed();
@@ -116,21 +120,21 @@ async function summary() {
     actions.push(new Action("erc721Enum", "safeTransferFrom -> rich user", receipt))
 
     // // ============= erc1155 ==============
-    // console.log("run erc1155")
-    // // @ts-ignore
-    // let erc1155 = await conflux.getContractAt("MYERC1155", contractAddrs.erc1155);
-    // receipt = await erc1155.mint(10).sendTransaction({ from: accounts[0].address, }).executed();
-    // actions.push(new Action("erc1155", "mint", receipt))
-    
-    // receipt = await erc1155.safeTransferFrom(accounts[0].address, receivers[0], 0, 1, []).sendTransaction({ from: accounts[0].address, }).executed();
-    // actions.push(new Action("erc1155", "safeTransferFrom -> poor user", receipt))
-    
-    // receipt = await erc1155.safeTransferFrom(accounts[0].address, receivers[0], 0, 1, []).sendTransaction({ from: accounts[0].address, }).executed();
-    // actions.push(new Action("erc1155", "safeTransferFrom -> owned t0 token", receipt))
-    
-    // receipt = await erc1155.mint(10).sendTransaction({ from: accounts[0].address, }).executed();
-    // receipt = await erc1155.safeTransferFrom(accounts[0].address, receivers[0], 1, 1, []).sendTransaction({ from: accounts[0].address, }).executed();
-    // actions.push(new Action("erc1155", "safeTransferFrom -> owned t0 and send t1", receipt))
+    console.log("run erc1155 without enum")
+    // @ts-ignore
+    let erc1155NoEnum = await conflux.getContractAt("ERC1155NFTCustomNoEnum", contractAddrs.erc1155NoEnum);
+    receipt = await erc1155NoEnum.mintTo(accounts[0].address, 0, 10, "").sendTransaction({ from: accounts[0].address, }).executed();
+    actions.push(new Action("erc1155NoEnum", "mint", receipt))
+
+    receipt = await erc1155NoEnum.safeTransferFrom(accounts[0].address, receivers[0], 0, 1, []).sendTransaction({ from: accounts[0].address, }).executed();
+    actions.push(new Action("erc1155NoEnum", "safeTransferFrom -> poor user", receipt))
+
+    receipt = await erc1155NoEnum.safeTransferFrom(accounts[0].address, receivers[0], 0, 1, []).sendTransaction({ from: accounts[0].address, }).executed();
+    actions.push(new Action("erc1155NoEnum", "safeTransferFrom -> owned t0 token", receipt))
+
+    receipt = await erc1155NoEnum.mintTo(accounts[0].address, 1, 10, "").sendTransaction({ from: accounts[0].address, }).executed();
+    receipt = await erc1155NoEnum.safeTransferFrom(accounts[0].address, receivers[0], 1, 1, []).sendTransaction({ from: accounts[0].address, }).executed();
+    actions.push(new Action("erc1155NoEnum", "safeTransferFrom -> owned t0 and send t1", receipt))
 
     // ============= erc1155 enum ==============
     console.log("run erc1155 enum")
