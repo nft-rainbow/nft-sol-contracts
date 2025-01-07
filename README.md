@@ -11,6 +11,8 @@ This project contains the NFT solidity contract templates
 
 ## Summary of costs
 
+Note: The following statistics are based on not setting the token URI separately, which means using the token URI as the base URI. Tests have shown that if the token URI is set separately, it will cause a significant increase in storage collateral consumption, which is related to the number of bytes in the token URI.
+
 Contract|Action|GasUsed|StorageCollateral|hash
 -|-|-|-|-
 erc721NoEnum|mint|40144|128|0x2cde364600936a0343d7f8dc164bab6e932ca31551ce3c44dcb90facade100e8
