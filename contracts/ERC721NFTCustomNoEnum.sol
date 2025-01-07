@@ -3,14 +3,11 @@ pragma solidity ^0.8.0;
 
 import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import { IERC2981 } from "@openzeppelin/contracts/interfaces/IERC2981.sol";
-import { ERC721Enumerable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import { CRC721Enumerable } from "@confluxfans/contracts/token/CRC721/extensions/CRC721Enumerable.sol";
 import { Initializable } from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
 
 import {ERC721URIStorage} from "./lib/ERC721URIStorage.sol";
-// import "./lib/Base64.sol";
 import { ConfigManager } from "./lib/ConfigManager.sol";
 import { StringUtils } from "./lib/StringUtils.sol";
 import { ConfluxHelper } from "./lib/ConfluxHelper.sol";
@@ -18,7 +15,7 @@ import { ConfluxHelper } from "./lib/ConfluxHelper.sol";
 // import {console} from "hardhat/console.sol";
 
 
-contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, Initializable, ConfluxHelper {
+contract ERC721NFTCustomNoEnum is ERC721URIStorage, ConfigManager, Initializable, ConfluxHelper {
 	using Strings for uint256;
 	using StringUtils for string;
 
@@ -168,19 +165,17 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 	/*============================= overrides==============================*/
 	function supportsInterface(
 		bytes4 interfaceId
-	) public view virtual override(ERC721Enumerable, ERC721, AccessControl) returns (bool) {
+	) public view virtual override(ERC721, AccessControl) returns (bool) {
 		return
 			ERC721.supportsInterface(interfaceId) ||
-			ERC721Enumerable.supportsInterface(interfaceId) ||
-			interfaceId == type(IERC2981).interfaceId ||
-			interfaceId == type(CRC721Enumerable).interfaceId;
+			interfaceId == type(IERC2981).interfaceId;
 	}
 
 	function _beforeTokenTransfer(
 		address from,
 		address to,
 		uint256 tokenId
-	) internal virtual override(ERC721Enumerable, ERC721) {
+	) internal virtual override(ERC721) {
 		if (from != address(0) && to != address(0)) {
 			require(block.timestamp - lastTransferTimes[tokenId] >= transferCooldownTime, "Now on cooldown time");
 			lastTransferTimes[tokenId] = block.timestamp;
@@ -192,14 +187,14 @@ contract ERC721NFTCustom is CRC721Enumerable, ERC721URIStorage, ConfigManager, I
 			// console.log("isAdminAndEnable %s, isUserAndEnable %s", isAdminAndEnable, isUserAndEnable);
 			require(isAdminAndEnable || isUserAndEnable, "ERC721NFTCustom: no permission");
 		}
-		ERC721Enumerable._beforeTokenTransfer(from, to, tokenId);
+		ERC721._beforeTokenTransfer(from, to, tokenId);
 	}
 
-	function tokenURI(uint256 tokenId) public view virtual override(ERC721URIStorage, ERC721) returns (string memory) {
+	function tokenURI(uint256 tokenId) public view virtual override(ERC721URIStorage) returns (string memory) {
 		return ERC721URIStorage.tokenURI(tokenId);
 	}
 
-	function _burn(uint256 tokenId) internal virtual override(ERC721URIStorage, ERC721) {
+	function _burn(uint256 tokenId) internal virtual override(ERC721URIStorage) {
 		return ERC721URIStorage._burn(tokenId);
 	}
 }

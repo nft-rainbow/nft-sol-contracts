@@ -20,8 +20,10 @@ program.command("update_templates")
     .description('update ERC721NFTCustom or ERC1155NFTCustom templates')
     .option('--erc721', 'if update ERC721NFTCustom template', false)
     .option('--erc1155', 'if update ERC1155NFTCustom template', false)
+    .option('--erc721NoEnum', 'if update ERC721NFTCustomNoEnum template', false)
+    .option('--erc1155NoEnum', 'if update ERC1155NFTCustomNoEnum template', false)
     .action(async (options) => {
-        await updateTemplates(options.erc721, options.erc1155);
+        await updateTemplates(options.erc721, options.erc1155, options.erc721NoEnum, options.erc1155NoEnum);
     });
 
 

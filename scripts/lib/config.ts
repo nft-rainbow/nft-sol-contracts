@@ -7,7 +7,7 @@ class AppConfig {
 }
 
 const _appConfigs = initAppConfig()
-console.log(_appConfigs)
+// console.log(_appConfigs)
 
 function initAppConfig(): Map<string, Map<string, AppConfig>> {
     const appConfigs = new Map<string, Map<string, AppConfig>>()

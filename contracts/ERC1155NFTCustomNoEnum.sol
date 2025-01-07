@@ -4,7 +4,6 @@ pragma solidity ^0.8.0;
 import { ERC1155 } from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import { IERC2981 } from "@openzeppelin/contracts/interfaces/IERC2981.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
-import { ICRC1155Enumerable, CRC1155Enumerable } from "@confluxfans/contracts/token/CRC1155/extensions/CRC1155Enumerable.sol";
 import { Initializable } from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
 
@@ -13,7 +12,7 @@ import { ConfigManager } from "./lib/ConfigManager.sol";
 import { StringUtils } from "./lib/StringUtils.sol";
 import { ConfluxHelper } from "./lib/ConfluxHelper.sol";
 
-contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager, Initializable, ConfluxHelper {
+contract ERC1155NFTCustomNoEnum is ERC1155URIStorage, ConfigManager, Initializable, ConfluxHelper {
 	using Strings for uint256;
 	using StringUtils for string;
 
@@ -72,7 +71,7 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 	}
 
 	function updateTokenURI(uint256 tokenId, string memory newUri) public onlyAdmin {
-		require(exists(tokenId), "NFT: update URI query for nonexistent token");
+		// require(exists(tokenId), "NFT: update URI query for nonexistent token");
 		require(metadataUpdatable, "NFT: Token URIs are frozen globally");
 		require(!freezeTokenUris[tokenId], "NFT: Token is frozen");
 		require(!newUri.equals(uri(tokenId)), "NFT: New token URI is same as updated");
@@ -107,7 +106,7 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 	}
 
 	function _mintTo(address to, uint256 id, uint256 amount, string memory tokenUri) internal {
-		revertIfUriConflict(id, tokenUri);
+		// revertIfUriConflict(id, tokenUri);
 		_mint(to, id, amount, "");
 		if (bytes(tokenUri).length > 0) {
 			setURI(id, tokenUri);
@@ -133,17 +132,17 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 			"input length not same"
 		);
 		for (uint256 i = 0; i < ids.length; i++) {
-			revertIfUriConflict(ids[i], uris[i]);
+			// revertIfUriConflict(ids[i], uris[i]);
 			require(tos[i] == address(tos[i]), "NFT: one of addresses is invalid");
 			_mintTo(tos[i], ids[i], amounts[i], uris[i]);
 		}
 	}
 
-	function revertIfUriConflict(uint256 id, string memory tokenUri) internal view {
-		if (exists(id)) {
-			require(tokenUri.equals(uri(id)), "NFT: URI different with previous");
-		}
-	}
+	// function revertIfUriConflict(uint256 id, string memory tokenUri) internal view {
+	// 	if (exists(id)) {
+	// 		require(tokenUri.equals(uri(id)), "NFT: URI different with previous");
+	// 	}
+	// }
 
 	/*============================= sponsor manager ======================*/
 
@@ -158,11 +157,10 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 	/*============================= overrides==============================*/
 	function supportsInterface(
 		bytes4 interfaceId
-	) public view virtual override(CRC1155Enumerable, ERC1155, AccessControl) returns (bool) {
+	) public view virtual override(ERC1155, AccessControl) returns (bool) {
 		return
 			ERC1155.supportsInterface(interfaceId) ||
-			interfaceId == type(IERC2981).interfaceId ||
-			interfaceId == type(ICRC1155Enumerable).interfaceId;
+			interfaceId == type(IERC2981).interfaceId;
 	}
 
 	function _beforeTokenTransfer(
@@ -172,7 +170,7 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 		uint256[] memory ids,
 		uint256[] memory amounts,
 		bytes memory data
-	) internal virtual override(CRC1155Enumerable, ERC1155) {
+	) internal virtual override(ERC1155) {
 		// from 0 menas mint
 		if (from != address(0)) {
 			bool isAdminAndEnable = isAdmin() && tokensTransferableByAdmin;
@@ -182,10 +180,10 @@ contract ERC1155NFTCustom is CRC1155Enumerable, ERC1155URIStorage, ConfigManager
 			require(isAdminAndEnable || isUserAndEnable, "ERC1155NFTCustom: no permission");
 		}
 
-		CRC1155Enumerable._beforeTokenTransfer(operator, from, to, ids, amounts, data);
+		ERC1155._beforeTokenTransfer(operator, from, to, ids, amounts, data);
 	}
 
-	function uri(uint256 tokenId) public view virtual override(ERC1155URIStorage, ERC1155) returns (string memory) {
+	function uri(uint256 tokenId) public view virtual override(ERC1155URIStorage) returns (string memory) {
 		return ERC1155URIStorage.uri(tokenId);
 	}
 }
