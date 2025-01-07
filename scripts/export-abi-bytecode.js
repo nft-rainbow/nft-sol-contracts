@@ -25,8 +25,10 @@ function exportDatas(source, target, wants) {
 exportDatas("../artifacts/contracts", process.argv[2], [
   "ERC1155NFT.sol",
   "ERC1155NFTCustom.sol",
+  "ERC1155NFTCustomNoEnum.sol",
   "ERC721NFT.sol",
   "ERC721NFTCustom.sol",
+  "ERC721NFTCustomNoEnum.sol",
   "NFTContractFactory.sol",
 ]);
 exportDatas("../artifacts/@confluxfans/contracts/InternalContracts", process.argv[2], ["AdminControl.sol",
